@@ -89,8 +89,6 @@ public class Table implements Serializable, Comparable<Table>, Cloneable {
 
     private DorisTypeConverters converters;
 
-    public Table() {}
-
     public Table(String name) {
         this.name = name;
     }
@@ -117,12 +115,7 @@ public class Table implements Serializable, Comparable<Table>, Cloneable {
                 this.converters = new DefaultDorisTypeConverters();
         }
         this.columns.forEach(item -> {
-            if (this.converters instanceof DefaultDorisTypeConverters) {
-                item.setType(
-                        converters.toDorisType(item.getJavaType().getJavaType(), item.getLength(), item.getScale()));
-            } else {
-                item.setType(converters.toDorisType(item.getType(), item.getLength(), item.getScale()));
-            }
+            item.setType(converters.toDorisType(item.getType(), item.getLength(), item.getScale()));
             this.columnMap.put(item.getName(), item);
         });
     }

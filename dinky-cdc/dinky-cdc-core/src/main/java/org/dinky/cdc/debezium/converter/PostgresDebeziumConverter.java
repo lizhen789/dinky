@@ -19,8 +19,10 @@
 
 package org.dinky.cdc.debezium.converter;
 
-import com.ververica.cdc.connectors.shaded.org.apache.kafka.connect.data.SchemaBuilder;
 import org.dinky.cdc.debezium.DebeziumCustomConverter;
+
+import org.apache.flink.cdc.connectors.shaded.org.apache.kafka.connect.data.SchemaBuilder;
+
 import io.debezium.spi.converter.RelationalColumn;
 
 /**
