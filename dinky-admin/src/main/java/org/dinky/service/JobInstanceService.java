@@ -63,6 +63,8 @@ public interface JobInstanceService extends ISuperService<JobInstance> {
 
     List<JobInstance> listJobInstancesToRecheck();
 
+    List<JobInstance> listAllJobInstances();
+
     /**
      * Get the job information detail for the given ID.
      *
