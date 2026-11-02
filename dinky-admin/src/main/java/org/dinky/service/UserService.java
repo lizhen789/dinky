@@ -84,12 +84,22 @@ public interface UserService extends ISuperService<User> {
     Result<UserDTO> loginUser(LoginDTO loginDTO);
 
     /**
+    /**
      *
      * @param loginSSODTO
      */
     UserDTO loginSSOUser(LoginSSODTO loginSSODTO) throws URISyntaxException, IOException;
 
     Result<UserDTO> loginUser(User user, boolean autoLogin);
+
+    /**
+     * loginCasdoorUser
+     *
+     * @param code
+     * @param state
+     * @return {@link Result}{@link UserDTO} obtain the user's UserDTO
+     */
+    Result<UserDTO> loginCasdoorUser(String code, String state);
 
     /**
      * get user by username

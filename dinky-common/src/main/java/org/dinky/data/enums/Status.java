@@ -126,6 +126,8 @@ public enum Status {
     TOKEN_FREEZED(10025, "token.freezed"),
     NO_PREFIX(10026, "no.prefix"),
     USER_SUPERADMIN_CANNOT_DELETE(10027, "user.superadmin.cannot.delete"),
+    STATE_CODE_ERROR(10028, "state.code.error"),
+    CASDOOR_DEFAULT_TENANT_NOFOUND(10029, "casdoor.default.tenant.notfound"),
 
     // role
     ROLE_ALREADY_EXISTS(10101, "role.already.exists"),
@@ -495,7 +497,12 @@ public enum Status {
     /**
      *  Catalog
      */
-    SYS_CATALOG_ONLY_SUPPORT_FLINK_SQL_OPERATION(214, "sys.catalog.operationOnlySupportedOnFlinkSql");
+    SYS_CATALOG_ONLY_SUPPORT_FLINK_SQL_OPERATION(214, "sys.catalog.operationOnlySupportedOnFlinkSql"),
+    /**
+     * Casdoor
+     */
+    SYS_CASDOOR_SETTINGS_DEFAULTTEANT(215, "sys.casdoor.settings.defaultTeant"),
+    SYS_CASDOOR_SETTINGS_DEFAULTTEANT_NOTE(216, "sys.casdoor.settings.defaultTeant.note");
 
     private final int code;
     private final String key;

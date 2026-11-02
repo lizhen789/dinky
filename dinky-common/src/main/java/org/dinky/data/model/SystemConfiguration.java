@@ -239,6 +239,11 @@ public class SystemConfiguration {
             .defaultValue("DefaultTenant")
             .note(Status.SYS_LDAP_SETTINGS_DEFAULTTEANT_NOTE);
 
+    private final Configuration<String> casdoorDefaultTeant = key(Status.SYS_CASDOOR_SETTINGS_DEFAULTTEANT)
+            .stringType()
+            .defaultValue("DefaultTenant")
+            .note(Status.SYS_CASDOOR_SETTINGS_DEFAULTTEANT_NOTE);
+
     private final Configuration<Boolean> ldapEnable = key(Status.SYS_LDAP_SETTINGS_ENABLE)
             .booleanType()
             .defaultValue(false)

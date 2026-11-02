@@ -109,6 +109,8 @@ public class AppConfig implements WebMvcConfigurer {
                         "/api/ldap/ldapEnableStatus",
                         "/api/sysConfig/getNeededCfg",
                         "/api/sysConfig/setInitConfig",
+                        "/api/getCasdoorUrl",
+                        "/api/loginWithCasdoor",
                         "/download/**",
                         "/druid/**",
                         "/api/version");

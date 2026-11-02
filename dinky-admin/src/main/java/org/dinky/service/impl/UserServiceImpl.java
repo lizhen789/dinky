@@ -80,6 +80,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
+import org.casbin.casdoor.entity.CasdoorUser;
+import org.casbin.casdoor.service.CasdoorAuthService;
 import org.pac4j.core.profile.ProfileManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -139,6 +141,8 @@ public class UserServiceImpl extends SuperServiceImpl<UserMapper, User> implemen
     private String callbackUrl;
 
     private final ReentrantLock lock = new ReentrantLock();
+
+    private final CasdoorAuthService casdoorAuthService;
 
     @Override
     public Result<Void> registerUser(User user) {
@@ -440,6 +444,76 @@ public class UserServiceImpl extends SuperServiceImpl<UserMapper, User> implemen
         } finally {
             lock.unlock();
         }
+    }
+
+    public Result<UserDTO> loginCasdoorUser(String code, String state) {
+        User user = null;
+        try {
+            user = casdoorLogin(code, state);
+        } catch (AuthException e) {
+            return Result.failed(e.getStatus() + e.getMessage());
+        }
+
+        // Check if the user is enabled
+        if (!user.getEnabled()) {
+            loginLogService.saveLoginLog(user, Status.USER_DISABLED_BY_ADMIN);
+            return Result.failed(Status.USER_DISABLED_BY_ADMIN);
+        }
+
+        UserDTO userInfo = refreshUserInfo(user);
+        if (Asserts.isNullCollection(userInfo.getTenantList())) {
+            loginLogService.saveLoginLog(user, Status.USER_NOT_BINDING_TENANT);
+            return Result.failed(Status.USER_NOT_BINDING_TENANT);
+        }
+
+        // Perform login using StpUtil (Assuming it handles the session management)
+        StpUtil.login(user.getId());
+
+        // save login log record
+        loginLogService.saveLoginLog(user, Status.LOGIN_SUCCESS);
+
+        // Return the user information along with a success status
+        return Result.succeed(userInfo, Status.LOGIN_SUCCESS);
+    }
+
+    private User casdoorLogin(String code, String state) throws AuthException {
+        User userFromCasdoor = null;
+        String token = casdoorAuthService.getOAuthToken(code, state);
+        CasdoorUser casdoorUser = casdoorAuthService.parseJwtToken(token);
+        if (casdoorUser.getName() != null) {
+            userFromCasdoor = new User();
+            userFromCasdoor.setUsername(casdoorUser.getName());
+            userFromCasdoor.setNickname(casdoorUser.getDisplayName());
+        } else {
+            throw new AuthException(Status.STATE_CODE_ERROR);
+        }
+        // Get user from local database
+        User userFromLocal = getUserByUsername(casdoorUser.getName());
+
+        if (Asserts.isNull(userFromLocal)) {
+            String defaultTeantCode =
+                    SystemConfiguration.getInstances().getCasdoorDefaultTeant().getValue();
+            Tenant tenant = tenantService.getTenantByTenantCode(defaultTeantCode);
+            if (Asserts.isNull(tenant)) {
+                loginLogService.saveLoginLog(userFromLocal, Status.CASDOOR_DEFAULT_TENANT_NOFOUND);
+                throw new AuthException(Status.CASDOOR_DEFAULT_TENANT_NOFOUND);
+            }
+
+            // Update Casdoor user properties and save
+            userFromCasdoor.setUserType(UserType.CASDOOR.getCode());
+            userFromCasdoor.setEnabled(true);
+            userFromCasdoor.setSuperAdminFlag(false);
+            userFromCasdoor.setIsDelete(false);
+            save(userFromCasdoor);
+
+            // Assign the user to the default tenant
+            List<Integer> userIds = getUserIdsByTenantId(tenant.getId());
+            User user = getUserByUsername(casdoorUser.getName());
+            userIds.add(user.getId());
+            tenantService.assignUserToTenant(new AssignUserToTenantDTO(tenant.getId(), userIds));
+            return user;
+        }
+        return userFromLocal;
     }
 
     private User localLogin(LoginDTO loginDTO) throws AuthException {
