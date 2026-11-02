@@ -42,6 +42,7 @@ const LoginForm: React.FC<LoginFormProps> = (props) => {
 
   const [submitting, setSubmitting] = useState(false);
   const [ldapEnabled, setLdapEnabled] = useState(false);
+  const [ssoEnabled, setSsoEnabled] = useState(false);
 
   useRequest(API_CONSTANTS.GET_NEEDED_CFG, {
     onSuccess: (res) => {
@@ -52,6 +53,22 @@ const LoginForm: React.FC<LoginFormProps> = (props) => {
       form.setFieldValue('ldapLogin', res[GLOBAL_SETTING_KEYS.SYS_LDAP_SETTINGS_ENABLE]);
     }
   });
+
+  useEffect(() => {
+    getData(API_CONSTANTS.GET_SSO_ENABLE).then(
+      (res) => {
+        setSsoEnabled(res.data);
+      },
+      (err) => console.error(err)
+    );
+    getData(API_CONSTANTS.GET_LDAP_ENABLE).then(
+      (res) => {
+        setLdapEnabled(res.data);
+        form.setFieldValue('ldapLogin', res.data);
+      },
+      (err) => console.error(err)
+    );
+  }, []);
 
   const handleClickLogin = async () => {
     setSubmitting(true);
@@ -99,6 +116,11 @@ const LoginForm: React.FC<LoginFormProps> = (props) => {
             <ProFormCheckbox name='ldapLogin' hidden={!ldapEnabled}>
               {l('login.ldapLogin')}
             </ProFormCheckbox>
+          </Col>
+          <Col span={6}>
+            <a href={API_CONSTANTS.SSO_LOGIN}  hidden={!ssoEnabled}>
+              {l('login.ssoLogin')}
+            </a>
           </Col>
         </Row>
       </>
@@ -239,3 +261,4 @@ const LoginForm: React.FC<LoginFormProps> = (props) => {
 };
 
 export default LoginForm;
+
