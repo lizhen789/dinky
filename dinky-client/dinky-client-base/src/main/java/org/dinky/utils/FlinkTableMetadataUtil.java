@@ -113,7 +113,7 @@ public class FlinkTableMetadataUtil {
                                 .isNullable(logicalType.isNullable())
                                 .comment(flinkColumn.getComment().orElse(""))
                                 .position(i)
-                                .build();
+                                .autoIncrement(false).build();
                         if (logicalType instanceof VarCharType) {
                             column.setLength(((VarCharType) logicalType).getLength());
                         } else if (logicalType instanceof TimestampType) {

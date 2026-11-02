@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SQLCatalogSinkBuilder extends AbstractSqlSinkBuilder implements Serializable {
+    private static final long serialVersionUID = 2185746285547955809L;
 
     public static final String KEY_WORD = "sql-catalog";
 

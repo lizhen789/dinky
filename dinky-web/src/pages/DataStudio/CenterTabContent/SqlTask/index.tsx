@@ -708,12 +708,13 @@ export const SqlTask = memo((props: FlinkSqlProps & any) => {
 
   const handleChangeJobLife = useCallback(async () => {
     if (JOB_LIFE_CYCLE.PUBLISH == currentState.step) {
-      await changeTaskLife(
+      let res = await changeTaskLife(
         l('global.table.lifecycle.offline'),
         currentState.taskId,
         JOB_LIFE_CYCLE.DEVELOP
       );
-      currentState.step = JOB_LIFE_CYCLE.DEVELOP;
+      // 校验是否成功
+      currentState.step = res && res.data ?  JOB_LIFE_CYCLE.DEVELOP : JOB_LIFE_CYCLE.PUBLISH;
     } else {
       await handleSave();
       const result = await changeTaskLife(
@@ -727,7 +728,9 @@ export const SqlTask = memo((props: FlinkSqlProps & any) => {
           setLastVersion(taskDetails.versionId);
         }
       }
-      currentState.step = JOB_LIFE_CYCLE.PUBLISH;
+      // 校验是否成功
+      currentState.step =
+        result && result.success ? JOB_LIFE_CYCLE.PUBLISH : JOB_LIFE_CYCLE.DEVELOP;
     }
     setCurrentState((prevState) => ({ ...prevState, step: currentState.step }));
   }, [handleSave, currentState.step, currentState.taskId]);

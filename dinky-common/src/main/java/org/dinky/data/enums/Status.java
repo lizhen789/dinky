@@ -480,7 +480,6 @@ public enum Status {
             204, "sys.flink.settings.flinkHistoryServerArchiveRefreshInterval"),
     SYS_FLINK_SETTINGS_FLINK_HISTORY_SERVER_ARCHIVE_REFRESH_INTERVAL_NOTE(
             205, "sys.flink.settings.flinkHistoryServerArchiveRefreshInterval.note"),
-<<<<<<< HEAD
 
     /**
      * approval
