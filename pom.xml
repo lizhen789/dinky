@@ -616,21 +616,6 @@
             </dependency>
             <dependency>
                 <groupId>org.dinky</groupId>
-                <artifactId>dinky-metadata-dm</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.dinky</groupId>
-                <artifactId>dinky-metadata-kingbase</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.dinky</groupId>
-                <artifactId>dinky-metadata-trino</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.dinky</groupId>
                 <artifactId>dinky-gateway</artifactId>
                 <version>${project.version}</version>
             </dependency>

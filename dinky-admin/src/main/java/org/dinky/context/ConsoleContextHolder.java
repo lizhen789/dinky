@@ -19,9 +19,6 @@
 
 package org.dinky.context;
 
-import static org.dinky.ws.GlobalWebSocket.sendTopic;
-
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.dinky.aop.ProcessAspect;
 import org.dinky.data.constant.DirConstant;
 import org.dinky.data.enums.ProcessStatus;
@@ -32,7 +29,7 @@ import org.dinky.data.exception.BusException;
 import org.dinky.data.model.ProcessEntity;
 import org.dinky.data.model.ProcessStepEntity;
 import org.dinky.utils.LogUtil;
-import org.dinky.ws.GlobalWebSocketTopic;
+import org.dinky.ws.handler.ProcessConsole;
 
 import org.apache.http.util.TextUtils;
 
@@ -42,7 +39,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -55,6 +51,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.UUID;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.text.StrFormatter;
+import cn.hutool.extra.spring.SpringUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -70,17 +67,17 @@ public class ConsoleContextHolder {
         return instance;
     }
 
-    private final Map<String, ProcessEntity> logPross = new ConcurrentHashMap<>();
+    private final Map<String, ProcessEntity> logProcess = new ConcurrentHashMap<>();
 
     /**
      * Get a list of all processes
      */
     public List<ProcessEntity> list() {
-        return new ArrayList<>(logPross.values());
+        return new ArrayList<>(logProcess.values());
     }
 
     public synchronized ProcessEntity killProcess(String processName) {
-        ProcessEntity process = logPross.get(processName);
+        ProcessEntity process = logProcess.get(processName);
         if (process == null) {
             return getProcess(processName);
         }
@@ -99,8 +96,8 @@ public class ConsoleContextHolder {
     }
 
     public ProcessEntity getProcess(String processName) {
-        if (logPross.containsKey(processName)) {
-            return logPross.get(processName);
+        if (logProcess.containsKey(processName)) {
+            return logProcess.get(processName);
         }
         try {
             String filePath = String.format("%s/log/%s.json", DirConstant.getTempRootDir(), processName);
@@ -134,11 +131,11 @@ public class ConsoleContextHolder {
      * @throws BusException Throws an exception if the process does not exist
      */
     public void appendLog(String processName, String stepPid, String logLine, boolean recordGlobal) {
-        if (!logPross.containsKey(processName)) {
+        if (!logProcess.containsKey(processName)) {
             log.debug("Process {} does not exist, This log was abandoned", processName);
             return;
         }
-        ProcessEntity process = logPross.get(processName);
+        ProcessEntity process = logProcess.get(processName);
         if (recordGlobal) {
             process.appendLog(logLine);
         }
@@ -152,11 +149,10 @@ public class ConsoleContextHolder {
             }
             process.setLastUpdateStep(stepNode);
         }
-        CompletableFuture.runAsync(() -> {
-            sendTopic(
-                    GlobalWebSocketTopic.PROCESS_CONSOLE,
-                    MapUtil.<String, Object>builder(processName, process).build());
-        });
+        // send ws event
+        Map<String, Object> data =
+                MapUtil.<String, Object>builder(processName, process).build();
+        SpringUtil.getBean(ProcessConsole.class).sendData(data);
     }
 
     /**
@@ -167,7 +163,7 @@ public class ConsoleContextHolder {
      * @throws RuntimeException Throws an exception if the process already exists
      */
     public synchronized void registerProcess(ProcessType type, String processName) throws RuntimeException {
-        if (logPross.containsKey(processName)) {
+        if (logProcess.containsKey(processName)) {
             throw new BusException(Status.PROCESS_REGISTER_EXITS);
         }
         ProcessEntity entity = ProcessEntity.builder()
@@ -180,7 +176,7 @@ public class ConsoleContextHolder {
                 .children(new CopyOnWriteArrayList<>())
                 .threadId(Thread.currentThread().getId())
                 .build();
-        logPross.put(processName, entity);
+        logProcess.put(processName, entity);
         appendLog(processName, null, "Start Process:" + processName, true);
     }
 
@@ -204,11 +200,11 @@ public class ConsoleContextHolder {
                 .children(new CopyOnWriteArrayList<>())
                 .build();
 
-        if (!logPross.containsKey(processName)) {
+        if (!logProcess.containsKey(processName)) {
             log.error(StrFormatter.format("Process {} does not exist", type));
             return processStepEntity;
         }
-        ProcessEntity process = logPross.get(processName);
+        ProcessEntity process = logProcess.get(processName);
         process.setStatus(ProcessStatus.RUNNING);
         if (TextUtils.isEmpty(parentStepPid)) {
             // parentStep为空表示为顶级节点
@@ -232,15 +228,8 @@ public class ConsoleContextHolder {
      * @param e           exception object, optional
      */
     public synchronized void finishedProcess(String processName, ProcessStatus status, Throwable e) {
-        ProcessEntity process = logPross.get(processName);
+        ProcessEntity process = logProcess.get(processName);
         try {
-            if(process==null) {
-                if(e!=null) {
-                    appendLog(processName, null, LogUtil.getError(e.getCause()), true);
-                    log.error("[{}] process is null, finishedProcess error: {}", processName, ExceptionUtils.getStackTrace(e));
-                }
-                return;
-            }
             process.setStatus(status);
             process.setEndTime(LocalDateTime.now());
             process.setTime(Duration.between(process.getStartTime(), process.getEndTime())
@@ -262,7 +251,7 @@ public class ConsoleContextHolder {
             appendLog(processName, null, LogUtil.getError(ex.getCause()), true);
             log.error("finishedProcess error", ex);
         } finally {
-            logPross.remove(processName);
+            logProcess.remove(processName);
         }
     }
 
@@ -275,7 +264,7 @@ public class ConsoleContextHolder {
      * @param e           exception object, optional
      */
     public void finishedStep(String processName, ProcessStepEntity step, ProcessStatus status, Exception e) {
-        if (!logPross.containsKey(processName)) {
+        if (!logProcess.containsKey(processName)) {
             return;
         }
         step.setStatus(status);
@@ -299,7 +288,7 @@ public class ConsoleContextHolder {
         String errorStr = StrFormatter.format(
                 "Get Parent Node Failed, This is most likely a Dinky bug, "
                         + "please report the following information back to the community：\nProcess:{},\nstep:{},\nprocessNam:{}",
-                JSONObject.toJSONString(logPross),
+                JSONObject.toJSONString(logProcess),
                 stepPid,
                 MDC.get(ProcessAspect.PROCESS_NAME));
         log.debug(errorStr);
@@ -324,6 +313,6 @@ public class ConsoleContextHolder {
     }
 
     private CopyOnWriteArrayList<ProcessStepEntity> getStepsMap(String processName) {
-        return logPross.get(processName).getChildren();
+        return logProcess.get(processName).getChildren();
     }
 }

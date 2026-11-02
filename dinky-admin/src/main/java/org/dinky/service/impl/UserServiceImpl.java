@@ -382,6 +382,8 @@ public class UserServiceImpl extends SuperServiceImpl<UserMapper, User> implemen
         } finally {
             lock.unlock();
         }
+    }
+
     private User ssoLogin(LoginDTO loginDTO) throws AuthException {
         // Get user from local database by username
         User user = getUserByUsername(loginDTO.getUsername());

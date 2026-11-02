@@ -52,9 +52,5 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.dinky</groupId>
-            <artifactId>dinky-alert-base</artifactId>
-        </dependency>
     </dependencies>
 </project>
