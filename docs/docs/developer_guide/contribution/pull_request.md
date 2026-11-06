@@ -40,9 +40,11 @@ Pull Request 本质上是一种软件的合作方式，是将涉及不同功能�
 
 当你向 Dinky 提交 pull request 的时候 code-style 是你不得不考虑的问题。我们在 CI 中使用 Spotless 来保持代码风格的统一，它是一种帮助开发者编写遵循编码规范的 Java 代码格式化工具。如果你的 pull request 没有通过 Spotless 的检测，那它将不会被合并到主库中。你可以在提交 pull request 前使用 Spotless 来检测或者格式化你的代码。
 
-1. 在提交 pull request 前格式化你的代码：执行 `mvn spotless:apply -P flink-all` 自动格式化。格式化代码的最佳时间是将你的修改提交到本地 git 版本库之前
+1. 在提交 pull request 前格式化你的代码：执行 `mvn spotless:apply` 自动格式化。格式化代码的最佳时间是将你的修改提交到本地
+   git 版本库之前
 
-2. 在提交 pull request 前编译整个项目：在 IDEA 中的 Profiles 中选择 aliyun,flink-all,nexus,prod,web，重载项目后执行 `mvn clean install -P aliyun,prod,scala-2.12,web,flink-all`，编译成功后即可提交代码
+2. 在提交 pull request 前编译整个项目：在 IDEA 中的 Profiles 中选择 aliyun,nexus,prod,web，重载项目后执行
+   `mvn clean install -P aliyun,prod,scala-2.12,web`，编译成功后即可提交代码
 
 ### 相关问题
 

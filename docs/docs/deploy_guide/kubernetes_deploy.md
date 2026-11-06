@@ -25,7 +25,7 @@ cd dinky-release-${FLINK-VERSION}-${DINKY-VERSION}/deploy/kubernetes/helm/dinky
 image:
   repository: "dinkydocker/dinky-standalone-server"
   pullPolicy: "Always"
-  tag: "1.0.3-flink1.17"
+  tag: "1.0.3-flink1.20"
   pullSecret: ""
 ```
 #### 内部数据源(同一个k8环境中部署mysql服务)
@@ -49,14 +49,15 @@ postgresql:
     password: "bigdata123!@#"
     database: "dinky-dev-1-17"
 ```
-修改flink版本，如下修改为1.17版本
+
+修改flink版本，如下修改为1.20版本
 ```yaml
 spec:
   replicaCount: 1
   containerPort: 8888
   name: rest
   extraEnv:
-    flinkVersion: "1.17"
+    flinkVersion: "1.20"
 ```
 例如，mysql数据源完整配置如下：
 完整配置如下：
@@ -87,7 +88,7 @@ fullnameOverride: ""
 image:
   repository: "dinkydocker/dinky-standalone-server"
   pullPolicy: "Always"
-  tag: "1.0.3-flink1.17"
+  tag: "1.0.3-flink1.20"
   pullSecret: ""
 
 mysql:
@@ -131,7 +132,7 @@ spec:
   containerPort: 8888
   name: rest
   extraEnv:
-    flinkVersion: "1.17"
+    flinkVersion: "1.20"
 
   affinity: {}
   nodeSelector: {}
@@ -243,7 +244,7 @@ fullnameOverride: ""
 image:
   repository: "dinkydocker/dinky-standalone-server"
   pullPolicy: "Always"
-  tag: "1.0.3-flink1.17"
+  tag: "1.0.3-flink1.20"
   pullSecret: ""
 
 mysql:
@@ -287,7 +288,7 @@ spec:
   containerPort: 8888
   name: rest
   extraEnv:
-    flinkVersion: "1.17"
+    flinkVersion: "1.20"
 
   affinity: {}
   nodeSelector: {}

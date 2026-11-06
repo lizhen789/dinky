@@ -23,7 +23,7 @@ echo "Clean Project ..."
 call ./mvnw.cmd clean -f pom.xml
 
 echo "Build Project ..."
-call ./mvnw.cmd package -f pom.xml -D"maven.test.skip=true"  -P aliyun,prod,web,flink-1.14
+call ./mvnw.cmd package -f pom.xml -D"maven.test.skip=true"  -P aliyun,prod,web
 
 :exit
 pause

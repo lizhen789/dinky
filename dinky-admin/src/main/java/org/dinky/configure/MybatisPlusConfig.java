@@ -19,15 +19,23 @@
 
 package org.dinky.configure;
 
+import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
+import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.handler.TenantLineHandler;
+import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerInterceptor;
+import com.google.common.collect.ImmutableSet;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.LongValue;
+import net.sf.jsqlparser.expression.NullValue;
 import org.dinky.context.TenantContextHolder;
 import org.dinky.interceptor.DinkySchemaInnerInterceptor;
 import org.dinky.interceptor.PostgreSQLPrepareInterceptor;
 import org.dinky.interceptor.PostgreSQLQueryInterceptor;
 import org.dinky.mybatis.handler.DateMetaObjectHandler;
 import org.dinky.mybatis.properties.MybatisPlusFillProperties;
-
-import java.util.Set;
-
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -37,18 +45,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
-import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
-import com.baomidou.mybatisplus.extension.plugins.handler.TenantLineHandler;
-import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
-import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerInterceptor;
-import com.google.common.collect.ImmutableSet;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.LongValue;
-import net.sf.jsqlparser.expression.NullValue;
+import java.util.Set;
 
 /** mybatisPlus config class */
 @Configuration
@@ -116,6 +113,18 @@ public class MybatisPlusConfig {
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor(
             ObjectProvider<DinkySchemaInnerInterceptor> schemaInterceptorProvider) {
+        return buildMybatisPlusInterceptor(schemaInterceptorProvider.getIfAvailable());
+    }
+
+    /**
+     * Build the MyBatis-Plus interceptor chain (tenant line + optional schema prefix +
+     * pagination). Extracted from the {@code @Bean} method so it can also be reused in
+     * tests without a Spring context.
+     *
+     * @param schemaInterceptor optional schema prefix interceptor; may be {@code null}
+     * @return the configured {@link MybatisPlusInterceptor}
+     */
+    public MybatisPlusInterceptor buildMybatisPlusInterceptor(DinkySchemaInnerInterceptor schemaInterceptor) {
         log.info("mybatis plus interceptor execute");
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
         interceptor.addInnerInterceptor(new TenantLineInnerInterceptor(new TenantLineHandler() {
@@ -139,7 +148,9 @@ public class MybatisPlusConfig {
         }));
         // Add schema prefix interceptor after tenant interceptor so that ignoreTable
         // still matches the original (un-prefixed) table names
-        schemaInterceptorProvider.ifAvailable(interceptor::addInnerInterceptor);
+        if (schemaInterceptor != null) {
+            interceptor.addInnerInterceptor(schemaInterceptor);
+        }
         interceptor.addInnerInterceptor(new PaginationInnerInterceptor());
         return interceptor;
     }

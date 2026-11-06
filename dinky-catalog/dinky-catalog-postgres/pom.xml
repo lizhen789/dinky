@@ -30,25 +30,7 @@
     <packaging>pom</packaging>
     <name>Dinky : Catalog : PostgresSQL</name>
 
-    <profiles>
-        <profile>
-            <id>flink-single-version</id>
-            <modules>
-                <module>dinky-catalog-postgres-${dinky.flink.version}</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>flink-all</id>
-            <modules>
-
-                <module>dinky-catalog-postgres-1.14</module>
-                <module>dinky-catalog-postgres-1.15</module>
-                <module>dinky-catalog-postgres-1.16</module>
-                <module>dinky-catalog-postgres-1.17</module>
-                <module>dinky-catalog-postgres-1.18</module>
-                <module>dinky-catalog-postgres-1.19</module>
-                <module>dinky-catalog-postgres-1.20</module>
-            </modules>
-        </profile>
-    </profiles>
+    <modules>
+        <module>dinky-catalog-postgres-1.20</module>
+    </modules>
 </project>

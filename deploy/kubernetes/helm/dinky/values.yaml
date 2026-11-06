@@ -68,7 +68,7 @@ spec:
   containerPort: 8888
   name: rest
   extraEnv:
-    flinkVersion: "1.17"
+    flinkVersion: "1.20"
 
   affinity: {}
   nodeSelector: {}

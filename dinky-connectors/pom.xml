@@ -33,20 +33,4 @@
     <modules>
         <module>dinky-connector-embedded</module>
     </modules>
-
-    <profiles>
-        <profile>
-            <id>flink-1.14</id>
-            <modules>
-                <module>dinky-connector-jdbc-1.14</module>
-            </modules>
-        </profile>
-
-        <profile>
-            <id>flink-all</id>
-            <modules>
-                <module>dinky-connector-jdbc-1.14</module>
-            </modules>
-        </profile>
-    </profiles>
 </project>

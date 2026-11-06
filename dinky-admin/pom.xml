@@ -447,13 +447,13 @@
 
         <dependency>
             <groupId>org.dinky</groupId>
-            <artifactId>dinky-client-${dinky.flink.version}</artifactId>
+            <artifactId>dinky-client-1.20</artifactId>
             <version>${revision}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.dinky</groupId>
-            <artifactId>dinky-flink-${dinky.flink.version}</artifactId>
+            <artifactId>dinky-flink-1.20</artifactId>
             <version>${revision}</version>
             <scope>provided</scope>
         </dependency>

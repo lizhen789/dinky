@@ -902,9 +902,9 @@ export default {
   'rc.cc.spDirHelp': 'Please enter the savepoint path! This parameter configuration item is',
   'rc.cc.sqlSubmitJarPath': 'Jar File Path',
   'rc.cc.sqlSubmitJarPathHelp':
-    'Please enter the Jar file path! eg: hdfs:///dinky/dinky-app-1.16-with-dependencies.jar',
+    'Please enter the Jar file path! eg: hdfs:///dinky/dinky-app-1.20-with-dependencies.jar',
   'rc.cc.sqlSubmitJarPathHelpTips':
-    'In Yarn mode, this parameter can be set to: hdfs:///dinky/dinky-app-1.17-with-dependencies.jar Alternatively, if rs:/dinky/inky app 1.17 with dependencies. jar is set to the rs:/ protocol, the jar package needs to be uploaded to Dinky`s resource center and the path filled in. In K8s mode, only the local://protocol is supported',
+    'In Yarn mode, this parameter can be set to: hdfs:///dinky/dinky-app-1.20-with-dependencies.jar Alternatively, if rs:/dinky/inky app 1.20 with dependencies. jar is set to the rs:/ protocol, the jar package needs to be uploaded to Dinky`s resource center and the path filled in. In K8s mode, only the local://protocol is supported',
   'rc.cc.start': 'Start Session Cluster',
   'rc.cc.submitSqlConfig': 'Submit FlinkSQL Config items',
   'rc.cc.tmHeap': 'TaskManager Heap Memory',

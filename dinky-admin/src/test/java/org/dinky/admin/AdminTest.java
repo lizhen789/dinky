@@ -21,8 +21,6 @@ package org.dinky.admin;
 
 import cn.dev33.satoken.secure.SaSecureUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.jasper.tagplugins.jstl.core.Url;
-import org.assertj.core.util.Arrays;
 import org.dinky.ltpa.config.LtpaSetting;
 import org.dinky.ltpa.token.LtpaToken;
 import org.junit.Assert;
@@ -31,8 +29,6 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.net.*;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 /**
  * SqlParserTest

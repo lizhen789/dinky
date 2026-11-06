@@ -14,27 +14,15 @@ Dinky支持以下几种 Flink on k8s 运行模式：
 - Kubernetes Operator Application(基于官方operator实现)
 
 > Dinky 不强制要求部署在 Kubernetes 集群中或Kubernetes 节点，但务必保障Dinky与 Kubernetes 集群的网络互通，以便于 Dinky 与 Kubernetes 集群进行交互，
-如果使用ClusterIP模式提交还需要确保Kubernetes内部网络与dinky互通
+> 如果使用ClusterIP模式提交还需要确保Kubernetes内部网络与dinky互通
 
 
 ## k8s环境准备
 **部分内容可参考 Flink 对应集成 k8s 文档链接**
 
 <Tabs groupId="flink-version">
-    <TabItem value="1.14" label="flink-1.14" default>
-        [https://nightlies.apache.org/flink/flink-docs-release-1.14/zh/docs/deployment/resource-providers/native_kubernetes/](https://nightlies.apache.org/flink/flink-docs-release-1.16/zh/docs/deployment/resource-providers/native_kubernetes/)
-    </TabItem>
-    <TabItem value="1.15" label="flink-1.15" default>
-        [https://nightlies.apache.org/flink/flink-docs-release-1.15/zh/docs/deployment/resource-providers/native_kubernetes/](https://nightlies.apache.org/flink/flink-docs-release-1.16/zh/docs/deployment/resource-providers/native_kubernetes/)
-    </TabItem>
-    <TabItem value="1.16" label="flink-1.16" default>
-        [https://nightlies.apache.org/flink/flink-docs-release-1.16/zh/docs/deployment/resource-providers/native_kubernetes/](https://nightlies.apache.org/flink/flink-docs-release-1.16/zh/docs/deployment/resource-providers/native_kubernetes/)
-    </TabItem>
-    <TabItem value="1.17" label="flink-1.17" default>
-        [https://nightlies.apache.org/flink/flink-docs-release-1.17/zh/docs/deployment/resource-providers/native_kubernetes/](https://nightlies.apache.org/flink/flink-docs-release-1.16/zh/docs/deployment/resource-providers/native_kubernetes/)
-    </TabItem>
-    <TabItem value="1.18" label="flink-1.18" default>
-        [https://nightlies.apache.org/flink/flink-docs-release-1.18/zh/docs/deployment/resource-providers/native_kubernetes/](https://nightlies.apache.org/flink/flink-docs-release-1.16/zh/docs/deployment/resource-providers/native_kubernetes/)
+    <TabItem value="1.20" label="flink-1.20" default>
+        [https://nightlies.apache.org/flink/flink-docs-release-1.20/zh/docs/deployment/resource-providers/native_kubernetes/](https://nightlies.apache.org/flink/flink-docs-release-1.20/zh/docs/deployment/resource-providers/native_kubernetes/)
     </TabItem>
 </Tabs>
 
@@ -53,19 +41,20 @@ kubectl create clusterrolebinding flink-role-binding-default --clusterrole=edit 
 
 ---
 ## 镜像制作
-本教程以下内容均使用Flink 1.15版本为例，如果使用其他版本，请根据文档自行更改版本号即可
+
+本教程以下内容均使用 Flink 1.20 版本为例
 ### 手动制作镜像
 #### 基础镜像Dockerfile模板
 **首先，你需要在当前extends目录下准备以下几个jar包**
 - commons-cli-1.3.1.jar
-- dinky-app-1.15-1.0.0-SNAPSHOT-jar-with-dependencies.jar
-- flink-table-planner_2.12-1.15.4.jar
+- dinky-app-1.20-1.0.0-SNAPSHOT-jar-with-dependencies.jar
+- flink-table-planner_2.12-1.20.2.jar
 
 > 上述仅为基础必须的依赖，如果你的flink任务有其他依赖需求，请自行补充添加
 
 **编写Dockerfile**
 ```shell
-ARG FLINK_VERSION=1.15.4   # flink 版本号
+ARG FLINK_VERSION=1.20.2   # flink 版本号
 
 FROM flink:${FLINK_VERSION}-scala_2.12 # flink官方镜像tag
 
@@ -77,17 +66,17 @@ RUN rm -rf ${FLINK_HOME}/lib/flink-table-planner-loader-*.jar # 删除loader包�
 **构建镜像并推送到私有镜像仓库**
 ```shell
 # 构建Dinky app镜像
-docker build -t dinky-flink:1.0.0-1.15.4 . --no-cache
+docker build -t dinky-flink:1.0.0-1.20.2 . --no-cache
 # 这一步为推送到私有镜像仓库过程，请根据需要自行修改参数
-docker tag dinky-flink:1.0.0-1.15.4 192.168.0.10:5000/dinky-flink-1.0.0-1.15.4
-docker push 192.168.0.10:5000/dinky-flink-1.0.0-1.15.4
+docker tag dinky-flink:1.0.0-1.20.2 192.168.0.10:5000/dinky-flink-1.0.0-1.20.2
+docker push 192.168.0.10:5000/dinky-flink-1.0.0-1.20.2
 ```
 
 #### 其他镜像Dockerfile模板
 ##### Python支持
 
 ```shell
-ARG FLINK_VERSION=1.15.4
+ARG FLINK_VERSION=1.20.2
 
 FROM flink:${FLINK_VERSION}-scala_2.12
 
@@ -108,7 +97,7 @@ RUN pip install "apache-flink==${FLINK_VERSION}" -i http://pypi.douban.com/simpl
 #### Hadoop支持
 请提前下载好hadoop安装包`hadoop-3.3.4.tar.gz`到当前目录,版本可自定义更改
 ```shell
-ARG FLINK_VERSION=1.15.4
+ARG FLINK_VERSION=1.20.2
 
 FROM flink:${FLINK_VERSION}-scala_2.12
 
@@ -123,7 +112,7 @@ ENV HADOOP_CONF_DIR=${HADOOP_HOME}/conf
 ENV PATH=${PATH}:${HADOOP_CLASSPATH}:${HADOOP_CONF_DIR}:${HADOOP_HOME}/bin
 
 USER flink
-RUN rm -rf ${FLINK_HOME}/lib/flink-table-planner-loader-1.15.4.jar
+RUN rm -rf ${FLINK_HOME}/lib/flink-table-planner-loader-1.20.2.jar
 ENV PATH $PYTHON_HOME/bin:$PATH
 ADD extends /opt/flink/lib # 把当前extends目录下的jar添加进依赖目录
 ```
@@ -139,15 +128,15 @@ ADD extends /opt/flink/lib # 把当前extends目录下的jar添加进依赖目�
 
 ##### Kubernetes 配置
 
-| 参数                 | 说明                                       | 是否必填 | 默认值 |           示例值            |
-|--------------------|------------------------------------------|:----:|:---:|:------------------------:|
-| 暴露端口类型             | 支持NodePort与ClusterIP                     |  是   |  无  |         NodePort         |
-| Kubernetes 命名空间    | 集群所在的 Kubernetes 命名空间                    |  是   |  无  |          dinky           |
-| K8s 提交账号           | 集群提交任务的账号                                |  是   |  无  |         default          |
-| Flink 镜像地址         | 上一步打包的镜像地址                               |  是   |  无  | dinky-flink-1.0.0-1.15.4 |
-| JobManager CPU 配置  | JobManager 资源配置                          |  否   |  无  |            1             |
-| TaskManager CPU 配置 | TaskManager 资源配置                         |  否   |  无  |            1             |
-| Flink 配置文件路径       | 仅指定到文件夹，dinky会自行读取文件夹下的配置文件并作为flink的默认配置 |  否   |  无  |     /opt/flink/conf      |
+| 参数                 | 说明                                                                   | 是否必填 | 默认值 |          示例值          |
+|----------------------|------------------------------------------------------------------------|:--------:|:------:|:------------------------:|
+| 暴露端口类型         | 支持NodePort与ClusterIP                                                |    是    |   无   |         NodePort         |
+| Kubernetes 命名空间  | 集群所在的 Kubernetes 命名空间                                         |    是    |   无   |          dinky           |
+| K8s 提交账号         | 集群提交任务的账号                                                     |    是    |   无   |         default          |
+| Flink 镜像地址       | 上一步打包的镜像地址                                                   |    是    |   无   | dinky-flink-1.0.0-1.20.2 |
+| JobManager CPU 配置  | JobManager 资源配置                                                    |    否    |   无   |            1             |
+| TaskManager CPU 配置 | TaskManager 资源配置                                                   |    否    |   无   |            1             |
+| Flink 配置文件路径   | 仅指定到文件夹，dinky会自行读取文件夹下的配置文件并作为flink的默认配置 |    否    |   无   |     /opt/flink/conf      |
 
 **注意**
 > 如果您是在k8s application模式下提交任务，您必须要Fink安装目录下面的conf目录拷贝到dinky的安装机器的/opt/flink/conf下面，如果目录不存在则创建这个目录。
@@ -164,9 +153,9 @@ ADD extends /opt/flink/lib # 把当前extends目录下的jar添加进依赖目�
 
 ##### 提交 FlinkSQL 配置项 (Application 模式必填)-公共配置
 
-| 参数       | 说明                                                         | 是否必填 | 默认值 |                                示例值                                |
-|----------|------------------------------------------------------------|:----:|:---:|:-----------------------------------------------------------------:|
-| Jar 文件路径 | 指定镜像内dinky-app的 Jar 文件路径,如果该集群配置用于提交 Application 模式任务时 则必填 |  否   |  无  | local:///opt/flink/dinky-app-1.16-1.0.0-jar-with-dependencies.jar |
+| 参数         | 说明                                                                                    | 是否必填 | 默认值 |                              示例值                               |
+|--------------|-----------------------------------------------------------------------------------------|:--------:|:------:|:-----------------------------------------------------------------:|
+| Jar 文件路径 | 指定镜像内dinky-app的 Jar 文件路径,如果该集群配置用于提交 Application 模式任务时 则必填 |    否    |   无   | local:///opt/flink/dinky-app-1.20-1.0.0-jar-with-dependencies.jar |
 > 由于flink限制，k8s模式只能加载镜像内的jar包，也就是地址必须为local://开头，如果想要自定义jar提交，请查阅jar提交部分
 
 

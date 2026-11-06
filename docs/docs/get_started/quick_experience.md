@@ -14,10 +14,10 @@ title: 快速开始
 
 ```shell
 # 拉取镜像
-docker pull dinkydocker/dinky-standalone-server:1.1.0-flink1.17
+docker pull dinkydocker/dinky-standalone-server:1.1.0-flink1.20
 # 运行程序
 docker run -p 8888:8888 \
- --name dinky dinkydocker/dinky-standalone-server:1.1.0-flink1.17
+ --name dinky dinkydocker/dinky-standalone-server:1.1.0-flink1.20
 ```
 
 :::tip 注意

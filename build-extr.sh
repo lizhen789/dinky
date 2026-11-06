@@ -20,34 +20,26 @@
 #
 # 使用说明
 #
-# 1. 默认构建:直接运行脚本，将使用默认的 jdk11 和 flink-1.18 版本。
+# 1. 默认构建:直接运行脚本，将使用默认的 jdk11。Dinky 仅支持 Flink 1.20，无需指定版本。
 #./build.sh
 # 2. 指定 JDK 版本:使用 -j 参数来指定 JDK 版本，例如使用 jdk8:
 #./build.sh -j jdk8
-# 3. 指定 Flink 版本:使用 -f 参数来指定 Flink 版本，例如使用 flink-1.14:
-#./build.sh -f flink-1.14
-# 4. 同时指定 JDK 和 Flink 版本:你可以同时指定 JDK 和 Flink 版本:
-#./build.sh -j jdk8 -f flink-1.15
 # 默认参数
 JDK_VERSION="jdk-11"
-FLINK_VERSION="flink-1.18"
 
 # 帮助信息
 usage() {
-  echo "Usage: $0 [-j <jdk_version>] [-f <flink_version>]"
+  echo "Usage: $0 [-j <jdk_version>]"
   echo "  -j <jdk_version>    指定 JDK 版本 (默认: jdk11, 可选: jdk8)"
-  echo "  -f <flink_version>  指定 Flink 版本 (默认: flink-1.18, 可选: flink-1.14, flink-1.15)"
+  echo "  Flink 版本固定为 1.20，无需指定"
   exit 1
 }
 
 # 解析命令行参数
-while getopts "j:f:" opt; do
+while getopts "j:" opt; do
   case ${opt} in
     j )
       JDK_VERSION=$OPTARG
-      ;;
-    f )
-      FLINK_VERSION=$OPTARG
       ;;
     * )
       usage
@@ -56,7 +48,7 @@ while getopts "j:f:" opt; do
 done
 
 # 构建命令
-CMD="./mvnw clean package -Dmaven.test.skip=true -P prod,${JDK_VERSION},flink-single-version,aliyun,${FLINK_VERSION},web"
+CMD="./mvnw clean package -Dmaven.test.skip=true -P prod,${JDK_VERSION},aliyun,web"
 
 # 执行构建命令
 echo "执行命令: $CMD"

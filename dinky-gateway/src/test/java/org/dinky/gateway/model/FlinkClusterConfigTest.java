@@ -19,15 +19,14 @@
 
 package org.dinky.gateway.model;
 
-import org.dinky.data.model.CustomConfig;
-
-import java.io.IOException;
-import java.util.List;
-
 import org.assertj.core.api.Assertions;
+import org.dinky.data.model.CustomConfig;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
+import java.util.List;
 
 public class FlinkClusterConfigTest {
 
@@ -63,7 +62,7 @@ public class FlinkClusterConfigTest {
                 + "        ]\n"
                 + "    },\n"
                 + "    \"appConfig\":{\n"
-                + "        \"userJarPath\":\"hdfs:///flink/dinky/jar/dinky-app-1.14-1.0.0-rc1-jar-with-dependencies.jar\"\n"
+                + "        \"userJarPath\":\"hdfs:///flink/dinky/jar/dinky-app-1.20-1.0.0-rc1-jar-with-dependencies.jar\"\n"
                 + "    }\n"
                 + "}";
         ObjectMapper objectMapper = new ObjectMapper();

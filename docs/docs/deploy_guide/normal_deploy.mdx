@@ -153,33 +153,13 @@ https://mvnrepository.com/artifact/org.apache.flink/flink-shaded-hadoop-3-uber?r
 │   ├── ExpressionVariableClass -- 全局变量动态加载的表达式扫描配置文件
 │   └── FlinkConfClass -- 全局变量动态加载 Flink 配置的扫描配置文件
 ├── extends
-│   ├── flink1.14  -- 适配 Flink1.14.x
-│   │   └── dinky
-│   │       ├── dinky-catalog-mysql-1.14-${VERSION}.jar -- dinky 的 catalog 实现
-│   │       ├── dinky-client-1.14-${VERSION}.jar
-│   │       └── dinky-connector-jdbc-1.14-${VERSION}.jar -- dinky 的 jdbc 连接器增强实现
-│   ├── flink1.15  -- 适配 Flink1.15.x
-│   │   └── dinky
-│   │       ├── dinky-catalog-mysql-1.15-${VERSION}.jar -- dinky 的 catalog 实现
-│   │       └── dinky-client-1.15-${VERSION}.jar
-│   ├── flink1.16  -- 适配 Flink1.16.x
-│   │   └── dinky
-│   │       ├── dinky-catalog-mysql-1.16-${VERSION}.jar -- dinky 的 catalog 实现
-│   │       └── dinky-client-1.16-${VERSION}.jar
-│   ├── flink1.17  -- 适配 Flink1.17.x
-│   │   └── dinky
-│   │       ├── dinky-catalog-mysql-1.17-${VERSION}.jar -- dinky 的 catalog 实现
-│   │       └── dinky-client-1.17-${VERSION}.jar
-│   └── flink1.18  -- 适配 Flink1.18.x
-│   │   └── dinky
-│   │       ├── dinky-catalog-mysql-1.18-${VERSION}.jar -- dinky 的 catalog 实现
-│   │       └── dinky-client-1.18-${VERSION}.jar
+│   └── flink1.20  -- 适配 Flink1.20.x
+│       └── dinky
+│           ├── dinky-catalog-mysql-1.20-${VERSION}.jar -- dinky 的 catalog 实现
+│           ├── dinky-catalog-postgres-1.20-${VERSION}.jar -- dinky 的 catalog 实现
+│           └── dinky-client-1.20-${VERSION}.jar
 ├── jar
-│   ├── dinky-app-1.14-${VERSION}-jar-with-dependencies.jar -- 适配 Flink1.14.x application
-│   ├── dinky-app-1.15-${VERSION}-jar-with-dependencies.jar -- 适配 Flink1.15.x application
-│   ├── dinky-app-1.16-${VERSION}-jar-with-dependencies.jar -- 适配 Flink1.16.x application
-│   ├── dinky-app-1.17-${VERSION}-jar-with-dependencies.jar -- 适配 Flink1.17.x application
-│   └── dinky-app-1.18-${VERSION}-jar-with-dependencies.jar -- 适配 Flink1.18.x application
+│   └── dinky-app-1.20-${VERSION}-jar-with-dependencies.jar -- 适配 Flink1.20.x application
 ├── lib
 │   └── ... -- Dinky 的内部依赖
 └── sql
@@ -190,27 +170,27 @@ https://mvnrepository.com/artifact/org.apache.flink/flink-shaded-hadoop-3-uber?r
 ### 添加Flink依赖
 对应 `Flink` 版本的依赖，放在Dinky 安装目录下 `extends/flink${FLINK_VERSION}` 下，
 :::warning 注意事项
-Flink自带lib里的planner是带loader的,比如:flink-table-planner-loader-1.16.1.jar,
+Flink自带lib里的planner是带loader的,比如:flink-table-planner-loader-1.20.2.jar,
 需要删除带loader的jar包，换一个不带loader的jar, 可前往flink根下的opt目录中找到，
 对于standalone，hdfs，k8s等集群上的flink集群同样要做此操作
 :::
 
 例如：
 ```shell
-flink-cep-1.16.1.jar
-flink-connector-files-1.16.1.jar
-flink-connector-jdbc-1.16.1.jar
-flink-csv-1.16.1.jar
-flink-dist-1.16.1.jar
-flink-json-1.16.1.jar
-flink-scala_2.12-1.16.1.jar
+flink-cep-1.20.2.jar
+flink-connector-files-1.20.2.jar
+flink-connector-jdbc-1.20.2.jar
+flink-csv-1.20.2.jar
+flink-dist-1.20.2.jar
+flink-json-1.20.2.jar
+flink-scala_2.12-1.20.2.jar
 flink-shaded-hadoop-2-uber-2.7.5-8.0.jar
 flink-shaded-zookeeper-3.5.9.jar
-flink-table-api-java-uber-1.16.1.jar
+flink-table-api-java-uber-1.20.2.jar
 
-flink-table-planner_2.12-1.16.1.jar
+flink-table-planner_2.12-1.20.2.jar
 
-flink-table-runtime-1.16.1.jar
+flink-table-runtime-1.20.2.jar
 log4j-1.2-api-2.17.1.jar
 log4j-api-2.17.1.jar
 log4j-core-2.17.1.jar
@@ -240,11 +220,11 @@ sh auto.sh startOnPending 1.20
 ```
 
 #### 版本适配
-启动指令的第二个参数则是版本选择，支持 【1.14, 1.15, 1.16, 1.17, 1.18, 1.19】,参考指令如下：
+启动指令的第二个参数则是版本选择，仅支持 【1.20】,参考指令如下：
 > 自 1.0.2 版本开始加入了自动检测 Flink 版本的功能，如果不传入版本号，则会自动检测 Flink 版本作为启动版本(即检测 extends 目录下的 `flink${FLINK_VERSION}` 文件夹)
 ```shell
 #启动
-sh ./bin/auto.sh start 1.16
+sh ./bin/auto.sh start 1.20
 ```
 
 :::tip 说明

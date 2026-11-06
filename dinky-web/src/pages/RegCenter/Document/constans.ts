@@ -17,7 +17,7 @@
  *
  */
 
-import { l } from '@/utils/intl';
+import {l} from '@/utils/intl';
 
 export const DOCUMENT_CATEGORY_ENUMS = {
   Variable: { text: 'Variable', value: 'Variable' },
@@ -80,30 +80,6 @@ export const DOCUMENT_FUNCTION_TYPE_ENUMS = {
  * versions  select options
  */
 export const VERSIONS = [
-  {
-    text: 'Flink-1.14',
-    value: '1.14'
-  },
-  {
-    text: 'Flink-1.15',
-    value: '1.15'
-  },
-  {
-    text: 'Flink-1.16',
-    value: '1.16'
-  },
-  {
-    text: 'Flink-1.17',
-    value: '1.17'
-  },
-  {
-    text: 'Flink-1.18',
-    value: '1.18'
-  },
-  {
-    text: 'Flink-1.19',
-    value: '1.19'
-  },
   {
     text: 'Flink-1.20',
     value: '1.20'

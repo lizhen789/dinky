@@ -34,27 +34,7 @@
     <modules>
         <module>dinky-client-hadoop</module>
         <module>dinky-client-base</module>
+        <module>dinky-client-1.20</module>
     </modules>
-
-    <profiles>
-        <profile>
-            <id>flink-single-version</id>
-            <modules>
-                <module>dinky-client-${dinky.flink.version}</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>flink-all</id>
-            <modules>
-                <module>dinky-client-1.14</module>
-                <module>dinky-client-1.15</module>
-                <module>dinky-client-1.16</module>
-                <module>dinky-client-1.17</module>
-                <module>dinky-client-1.18</module>
-                <module>dinky-client-1.19</module>
-                <module>dinky-client-1.20</module>
-            </modules>
-        </profile>
-    </profiles>
 
 </project>

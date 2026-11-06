@@ -20,25 +20,26 @@ title: Dinky 与 Flink 集成
 - JDK 1.8/11 
 - Dinky 1.0.0+
 - MySQL 5.7+
-- Flink 1.14+(Dinky v1.0.0 支持 Flink 1.14+ 及以上版本)
+- Flink 1.20
 
 ## Flink 环境准备
 
-> 本案例以 Flink 1.18.0 模式采用 Standalone 模式为例, 请根据实际情况自行选择部署模式,各个模式的部署方案自行参考 Flink 官方文档/百度/谷歌/必应...
+> 本案例以 Flink 1.20.2 模式采用 Standalone 模式为例, 请根据实际情况自行选择部署模式,各个模式的部署方案自行参考 Flink
+> 官方文档/百度/谷歌/必应...
 
 ### 下载 Flink
 ```bash
 
-wget https://archive.apache.org/dist/flink/flink-1.18.0/flink-1.18.0-bin-scala_2.12.tgz
+wget https://archive.apache.org/dist/flink/flink-1.20.2/flink-1.20.2-bin-scala_2.12.tgz
 
 ```
 
 ### 解压 Flink
 
 ```bash
-tar -zxvf flink-1.18.0-bin-scala_2.12.tgz
+tar -zxvf flink-1.20.2-bin-scala_2.12.tgz
 
-mv flink-1.18.0 flink
+mv flink-1.20.2 flink
 
 ```
 
@@ -153,11 +154,11 @@ wget https://repo1.maven.org/maven2/commons-cli/commons-cli/1.6.0/commons-cli-1.
 
 # 将 flink-table-planner-loader 包换成 flink-table-planner 包
 # 先删除 flink-table-planner-loader 包
-rm -rf /opt/dinky/extends/flink-table-planner-loader-1.18.0.jar
-rm -rf /opt/flink/lib/flink-table-planner-loader-1.18.0.jar
+rm -rf /opt/dinky/extends/flink-table-planner-loader-1.20.2.jar
+rm -rf /opt/flink/lib/flink-table-planner-loader-1.20.2.jar
 # 将 flink-table-planner 包复制到 extends 目录下和 flink lib 目录下
-cp /opt/flink/opt/flink-table-planner_2.12-1.18.0.jar /opt/flink/lib/
-cp /opt/flink/opt/flink-table-planner_2.12-1.18.0.jar /opt/dinky/extends/
+cp /opt/flink/opt/flink-table-planner_2.12-1.20.2.jar /opt/flink/lib/
+cp /opt/flink/opt/flink-table-planner_2.12-1.20.2.jar /opt/dinky/extends/
 
 ```
 :::warning 注意
@@ -171,7 +172,7 @@ cp /opt/flink/opt/flink-table-planner_2.12-1.18.0.jar /opt/dinky/extends/
 :::warning 注意
 当你阅读到这里的时候, 请确保你已经完成了上述的所有步骤, Flink 已经启动, 并可以正常访问. 请先不要添加其他连接器依赖
 
-下述的命令中 1.18 代表 Flink 版本, 请根据实际情况修改 支持 1.14 , 1.15, 1.16 , 1.17 , 1.18,
+下述命令中的 1.20 代表 Flink 版本，Dinky 当前仅支持 Flink 1.20。
 
 通过指定版本使 Dinky 加载对应版本的 Flink 依赖, 以便 Dinky 能够正常与 Flink 集成。
 :::
@@ -179,8 +180,8 @@ cp /opt/flink/opt/flink-table-planner_2.12-1.18.0.jar /opt/dinky/extends/
 ```bash
 
 cd dinky
-# 1.18 代表 Flink 版本, 请根据实际情况修改 支持 1.14 , 1.15, 1.16 , 1.17 , 1.18, 
-./auto.sh start 1.18
+# 1.20 代表 Flink 版本，Dinky 当前仅支持 Flink 1.20。
+./auto.sh start 1.20
 
 ```
 

@@ -47,7 +47,7 @@ jobs:
 
       - name: Run spotless apply
         if:  steps.filter.outputs.backend == 'true'
-        run : ./mvnw -T 4C -B --no-snapshot-updates clean spotless:apply -P flink-all
+        run: ./mvnw -T 4C -B --no-snapshot-updates clean spotless:apply
       - uses: actions/setup-node@v3
         if: steps.filter.outputs.frontend == 'true'
         with:

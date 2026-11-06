@@ -236,12 +236,6 @@ echo
 echo -e "${GREEN} ====================== Flink depends on initialization script -> start ====================== ${RESET}"
 
 declare -A version_map
-version_map["1.14"]="1.14.6"
-version_map["1.15"]="1.15.4"
-version_map["1.16"]="1.16.3"
-version_map["1.17"]="1.17.2"
-version_map["1.18"]="1.18.1"
-version_map["1.19"]="1.19.1"
 version_map["1.20"]="1.20.0"
 
 FLINK_VERSION_SCAN=$(ls -n "${EXTENDS_HOME}" | grep '^d' | grep flink | awk -F 'flink' '{print $2}')

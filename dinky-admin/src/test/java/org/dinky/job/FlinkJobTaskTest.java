@@ -19,21 +19,16 @@
 
 package org.dinky.job;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.when;
-
+import com.google.common.io.ByteStreams;
+import com.sun.net.httpserver.HttpServer;
+import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.datasource.unpooled.UnpooledDataSource;
+import org.apache.ibatis.mapping.Environment;
+import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
+import org.dinky.configure.DinkyMetadataProperties;
 import org.dinky.configure.MybatisPlusConfig;
 import org.dinky.context.SpringContextUtils;
 import org.dinky.context.TenantContextHolder;
@@ -46,23 +41,11 @@ import org.dinky.data.model.ext.JobInfoDetail;
 import org.dinky.data.model.job.JobInstance;
 import org.dinky.mapper.AlertRulesMapper;
 import org.dinky.mybatis.properties.MybatisPlusFillProperties;
-import org.dinky.service.AlertHistoryService;
-import org.dinky.service.ClusterInstanceService;
-import org.dinky.service.HistoryService;
-import org.dinky.service.JobHistoryService;
-import org.dinky.service.JobInstanceService;
-import org.dinky.service.MonitorService;
-import org.dinky.service.TaskService;
-import org.dinky.service.UserService;
+import org.dinky.service.*;
 import org.dinky.service.impl.AlertRuleServiceImpl;
-
-import org.apache.ibatis.annotations.Update;
-import org.apache.ibatis.datasource.unpooled.UnpooledDataSource;
-import org.apache.ibatis.mapping.Environment;
-import org.apache.ibatis.session.Configuration;
-import org.apache.ibatis.session.SqlSession;
-import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
+import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.StaticApplicationContext;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -72,22 +55,16 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.StaticApplicationContext;
-
-import com.google.common.io.ByteStreams;
-import com.sun.net.httpserver.HttpServer;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.*;
 
 class FlinkJobTaskTest {
 
@@ -349,7 +326,8 @@ class FlinkJobTaskTest {
                 Configuration configuration =
                         new Configuration(new Environment("test", new JdbcTransactionFactory(), dataSource));
                 configuration.addInterceptor(
-                        new MybatisPlusConfig(new MybatisPlusFillProperties()).mybatisPlusInterceptor());
+                        new MybatisPlusConfig(new MybatisPlusFillProperties(), new DinkyMetadataProperties())
+                                .buildMybatisPlusInterceptor(null));
                 configuration.addMapper(JobStatusMapper.class);
 
                 try (SqlSession session =

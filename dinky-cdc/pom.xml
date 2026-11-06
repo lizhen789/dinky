@@ -15,49 +15,11 @@
     <name>Dinky : CDC</name>
     <modules>
         <module>dinky-cdc-core</module>
+        <module>dinky-cdc-plus</module>
     </modules>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
-
-    <profiles>
-        <profile>
-            <id>flink-1.15</id>
-            <modules>
-                <module>dinky-cdc-plus</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>flink-1.16</id>
-            <modules>
-                <module>dinky-cdc-plus</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>flink-1.17</id>
-            <modules>
-                <module>dinky-cdc-plus</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>flink-1.18</id>
-            <modules>
-                <module>dinky-cdc-plus</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>flink-1.19</id>
-            <modules>
-                <module>dinky-cdc-plus</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>flink-1.20</id>
-            <modules>
-                <module>dinky-cdc-plus</module>
-            </modules>
-        </profile>
-    </profiles>
 </project>

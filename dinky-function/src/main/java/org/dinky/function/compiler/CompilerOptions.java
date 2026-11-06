@@ -1,15 +1,14 @@
 package org.dinky.function.compiler;
 
-import sun.misc.SharedSecrets;
-import sun.misc.URLClassPath;
-
 import java.io.File;
-import java.lang.reflect.Field;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * Author: lwjhn
@@ -17,22 +16,42 @@ import java.util.stream.Collectors;
  * Description:
  */
 public class CompilerOptions {
-    private static final Iterable<String> options ;
+    private static final Iterable<String> options;
 
     private static final String classpath;
 
     static {
-        try {
-            Field field = URLClassPath.class.getDeclaredField("lmap");
-            field.setAccessible(true);
+        Set<String> paths = new LinkedHashSet<>();
+        String javaClassPath = System.getProperty("java.class.path");
+        if (javaClassPath != null && !javaClassPath.isEmpty()) {
+            Collections.addAll(paths, javaClassPath.split(Pattern.quote(File.pathSeparator)));
+        }
+        // Include jars added at runtime via URLClassLoader#addURL (e.g. DinkyClassLoader).
+        // Since JDK 9 the application class loader is no longer a URLClassLoader, so java.class.path
+        // is the primary source and URLClassLoader chains are collected as a supplement.
+        collectClasspathUrls(CompilerOptions.class.getClassLoader(), paths);
+        collectClasspathUrls(Thread.currentThread().getContextClassLoader(), paths);
+        paths.remove("");
 
-            URLClassPath urlClassPath = SharedSecrets.getJavaNetAccess().getURLClassPath((URLClassLoader) CompilerOptions.class.getClassLoader());
+        classpath = String.join(File.pathSeparator, paths);
+        options = Collections.unmodifiableList(Arrays.asList("-encoding", "UTF-8", "-classpath", classpath));
+    }
 
-            options = Collections.unmodifiableList(Arrays.asList("-encoding", "UTF-8", "-classpath",
-                    classpath = String.join(File.pathSeparator, ((Map<String, Object>) field.get(urlClassPath)).keySet()
-                            .stream().map(o->o.replaceAll("^file://", "")).collect(Collectors.toSet()))));
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException(e);
+    private static void collectClasspathUrls(ClassLoader classLoader, Set<String> paths) {
+        while (classLoader != null) {
+            if (classLoader instanceof URLClassLoader) {
+                for (URL url : ((URLClassLoader) classLoader).getURLs()) {
+                    if (!"file".equalsIgnoreCase(url.getProtocol())) {
+                        continue;
+                    }
+                    try {
+                        paths.add(new File(url.toURI()).getAbsolutePath());
+                    } catch (URISyntaxException | IllegalArgumentException e) {
+                        paths.add(url.getPath());
+                    }
+                }
+            }
+            classLoader = classLoader.getParent();
         }
     }
 
