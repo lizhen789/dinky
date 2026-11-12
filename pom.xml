@@ -995,10 +995,10 @@
         <profile>
             <id>prod</id>
             <activation>
+                <!-- Do not add the "!dev" property condition here: -P dev does not set a "dev"
+                     system property, so the condition is always true and prod (declared after dev)
+                     would override scope.runtime back to provided even when dev is enabled. -->
                 <activeByDefault>true</activeByDefault>
-                <property>
-                    <name>!dev</name>
-                </property>
             </activation>
             <properties>
                 <scope.runtime>provided</scope.runtime>
@@ -1109,6 +1109,21 @@
                     </plugins>
                 </pluginManagement>
             </build>
+        </profile>
+
+        <profile>
+            <!-- IntelliJ IDEA exposes idea.version when importing Maven projects.
+                 Flink jars are provided in the release package (extends/flink1.20), but an IDE run
+                 needs them on the runtime classpath. -->
+            <id>ide</id>
+            <activation>
+                <property>
+                    <name>idea.version</name>
+                </property>
+            </activation>
+            <properties>
+                <scope.runtime>compile</scope.runtime>
+            </properties>
         </profile>
     </profiles>
 </project>

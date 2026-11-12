@@ -54,21 +54,11 @@ const LoginForm: React.FC<LoginFormProps> = (props) => {
     }
   });
 
-  useEffect(() => {
-    getData(API_CONSTANTS.GET_SSO_ENABLE).then(
-      (res) => {
-        setSsoEnabled(res.data);
-      },
-      (err) => console.error(err)
-    );
-    getData(API_CONSTANTS.GET_LDAP_ENABLE).then(
-      (res) => {
-        setLdapEnabled(res.data);
-        form.setFieldValue('ldapLogin', res.data);
-      },
-      (err) => console.error(err)
-    );
-  }, []);
+  useRequest(API_CONSTANTS.GET_SSO_ENABLE, {
+    onSuccess: (res) => {
+      setSsoEnabled(Boolean(res));
+    }
+  });
 
   const handleClickLogin = async () => {
     setSubmitting(true);

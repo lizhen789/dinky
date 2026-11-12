@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import cn.hutool.core.io.resource.ResourceUtil;
@@ -52,15 +53,13 @@ public class FlinkConfigOptionsUtils {
 
         List<FlinkConfigOption> configList = new ArrayList<>();
         try {
-            Class<?> loadClass = ClassLoaderUtil.getContextClassLoader().loadClass(name);
-            Field[] fields = ReflectUtil.getFields(loadClass, f -> {
-                try {
-                    return f.getType().isAssignableFrom(Class.forName("org.apache.flink.configuration.ConfigOption"))
-                            && Modifier.isStatic(f.getModifiers());
-                } catch (ClassNotFoundException e) {
-                    return false;
-                }
-            });
+            ClassLoader classLoader = ClassLoaderUtil.getContextClassLoader();
+            Class<?> configOptionClass = classLoader.loadClass("org.apache.flink.configuration.ConfigOption");
+            Class<?> loadClass = classLoader.loadClass(name);
+            Field[] fields = ReflectUtil.getFields(
+                    loadClass,
+                    f -> f.getType().isAssignableFrom(configOptionClass)
+                            && Modifier.isStatic(f.getModifiers()));
             for (Field field : fields) {
                 FlinkConfigOption config = new FlinkConfigOption();
                 Object fieldValue = ReflectUtil.getStaticFieldValue(field);
@@ -77,7 +76,11 @@ public class FlinkConfigOptionsUtils {
                 }
                 configList.add(config);
             }
-        } catch (ClassNotFoundException ignored) {
+        } catch (ClassNotFoundException | LinkageError e) {
+            // A config options class may reference types from Flink modules that are not on the
+            // classpath (e.g. when Flink is provided by an external distribution). Skip it instead
+            // of failing the whole request with NoClassDefFoundError.
+            logger.log(Level.FINE, "Flink config options class is not available: " + name, e);
         }
         return configList;
     }

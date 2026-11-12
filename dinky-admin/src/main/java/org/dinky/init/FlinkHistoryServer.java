@@ -49,6 +49,13 @@ import lombok.extern.slf4j.Slf4j;
 @Order(value = 2)
 public class FlinkHistoryServer implements ApplicationRunner {
     public static final Set<String> HISTORY_JOBID_SET = new LinkedHashSet<>();
+
+    private static final String[] REQUIRED_FLINK_CLASSES = {
+            "org.apache.flink.util.FlinkException",
+            "org.apache.flink.configuration.Configuration",
+            "org.apache.flink.runtime.webmonitor.history.HistoryServer"
+    };
+
     private final ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
             5, 20, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<>(100), new ThreadPoolExecutor.DiscardOldestPolicy());
 
@@ -59,23 +66,47 @@ public class FlinkHistoryServer implements ApplicationRunner {
     public FlinkHistoryServer(JobInstanceService jobInstanceService, SysConfigService sysConfigService) {
         this.sysConfigService = sysConfigService;
         this.historyRunnable = () -> {
-            Map<String, String> flinkHistoryServerConfiguration =
-                    SystemConfiguration.getInstances().getFlinkHistoryServerConfiguration();
-            flinkHistoryServerConfiguration.putAll(BaseResourceManager.convertFlinkResourceConfig());
+            try {
+                Map<String, String> flinkHistoryServerConfiguration =
+                        SystemConfiguration.getInstances().getFlinkHistoryServerConfiguration();
+                flinkHistoryServerConfiguration.putAll(BaseResourceManager.convertFlinkResourceConfig());
 
-            HistoryServerUtil.run(
-                    (jobId) -> {
-                        HISTORY_JOBID_SET.add(jobId);
-                        threadPoolExecutor.execute(() -> {
-                            jobInstanceService.hookJobDoneByHistory(jobId);
-                        });
-                    },
-                    flinkHistoryServerConfiguration);
+                HistoryServerUtil.run(
+                        (jobId) -> {
+                            HISTORY_JOBID_SET.add(jobId);
+                            threadPoolExecutor.execute(() -> {
+                                jobInstanceService.hookJobDoneByHistory(jobId);
+                            });
+                        },
+                        flinkHistoryServerConfiguration);
+            } catch (LinkageError | RuntimeException e) {
+                log.error("Flink History service failed to start: ", e);
+            }
         };
+    }
+
+    private static boolean isFlinkHistoryServerAvailable() {
+        ClassLoader classLoader = FlinkHistoryServer.class.getClassLoader();
+        for (String className : REQUIRED_FLINK_CLASSES) {
+            try {
+                Class.forName(className, false, classLoader);
+            } catch (ClassNotFoundException | LinkageError e) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
+        if (systemConfiguration.getUseFlinkHistoryServer().getValue() && !isFlinkHistoryServerAvailable()) {
+            log.warn(
+                    "Flink History Server is enabled but Flink runtime classes are not on the classpath, "
+                            + "skip starting the embedded history server. In an IDE, activate the dev profile and reload Maven; "
+                            + "for a release package, put the Flink 1.20 lib jars under extends/flink1.20.");
+            return;
+        }
+
         AtomicReference<Thread> historyThread = new AtomicReference<>(new Thread(historyRunnable));
         Runnable closeHistory = () -> {
             if (historyThread.get().isAlive()) {
