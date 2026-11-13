@@ -51,8 +51,8 @@
                     <npmVersion>10.5.0</npmVersion>
                     <pnpmVersion>9.15.4</pnpmVersion>
                     <!-- 国内node下载加速 -->
-                    <!--<nodeDownloadRoot>https://mirrors.huaweicloud.com/nodejs/</nodeDownloadRoot>-->
-                    <!--<npmDownloadRoot>https://repo.huaweicloud.com/npm-software/</npmDownloadRoot>-->
+                    <!--                    <nodeDownloadRoot>https://mirrors.huaweicloud.com/nodejs/</nodeDownloadRoot>-->
+                    <!--                    <npmDownloadRoot>https://repo.huaweicloud.com/npm-software/</npmDownloadRoot>-->
                 </configuration>
                 <executions>
                     <execution>

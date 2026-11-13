@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding" defaultCharsetForPropertiesFiles="UTF-8">
+    <file url="file://D:/src/services" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dinky-admin/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dinky-admin/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dinky-alert/dinky-alert-base/src/main/java" charset="UTF-8" />
@@ -19,22 +20,32 @@
     <file url="file://$PROJECT_DIR$/dinky-alert/dinky-alert-wechat/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dinky-alert/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dinky-alert/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/dinky-app/dinky-app-2.3/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/dinky-app/dinky-app-2.3/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dinky-app/dinky-app-base/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dinky-app/dinky-app-base/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dinky-app/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dinky-app/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dinky-assembly/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dinky-assembly/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/dinky-catalog/dinky-catalog-mysql/dinky-catalog-mysql-2.3/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/dinky-catalog/dinky-catalog-mysql/dinky-catalog-mysql-2.3/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dinky-catalog/dinky-catalog-mysql/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dinky-catalog/dinky-catalog-mysql/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/dinky-catalog/dinky-catalog-postgres/dinky-catalog-postgres-2.3/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/dinky-catalog/dinky-catalog-postgres/dinky-catalog-postgres-2.3/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dinky-catalog/dinky-catalog-postgres/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dinky-catalog/dinky-catalog-postgres/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dinky-catalog/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dinky-catalog/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dinky-cdc/dinky-cdc-core/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dinky-cdc/dinky-cdc-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/dinky-cdc/dinky-cdc-plus/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/dinky-cdc/dinky-cdc-plus/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dinky-cdc/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dinky-cdc/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/dinky-client/dinky-client-2.3/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/dinky-client/dinky-client-2.3/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dinky-client/dinky-client-base/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dinky-client/dinky-client-base/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dinky-client/dinky-client-hadoop/src/main/java" charset="UTF-8" />
@@ -43,6 +54,8 @@
     <file url="file://$PROJECT_DIR$/dinky-client/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dinky-common/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dinky-common/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/dinky-connectors/dinky-connector-embedded/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/dinky-connectors/dinky-connector-embedded/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dinky-connectors/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dinky-connectors/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dinky-core/src/main/java" charset="UTF-8" />
@@ -51,6 +64,8 @@
     <file url="file://$PROJECT_DIR$/dinky-daemon/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dinky-extends/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dinky-extends/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/dinky-flink/dinky-flink-2.3/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/dinky-flink/dinky-flink-2.3/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dinky-flink/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dinky-flink/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dinky-function/src/main/java" charset="UTF-8" />
@@ -91,6 +106,7 @@
     <file url="file://$PROJECT_DIR$/dinky-sandbox/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dinky-scheduler/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/dinky-scheduler/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/dinky-web/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
   </component>

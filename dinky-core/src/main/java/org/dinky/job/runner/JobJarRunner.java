@@ -74,6 +74,13 @@ public class JobJarRunner extends AbstractJobRunner {
     }
 
     @Override
+    public Optional<JobClient> execute(JobStatement jobStatement) throws Exception {
+        JobClient jobClient = FlinkStreamEnvironmentUtil.executeAsync(
+                getPipeline(jobStatement), executor.getCustomTableEnvironment());
+        return Optional.ofNullable(jobClient);
+    }
+
+    @Override
     public void run(JobStatement jobStatement) throws Exception {
         jobManager.getJob().setPipeline(true);
         if (!jobManager.isUseGateway()) {

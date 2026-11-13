@@ -81,6 +81,7 @@ const JobModal: React.FC<JobModalProps> = (props) => {
       form.resetFields();
       form.setFieldsValue(newValues);
     }
+    form.setFieldsValue(newValues);
   }, [open, values, form]);
 
   const queryUdfTemplate = () => {

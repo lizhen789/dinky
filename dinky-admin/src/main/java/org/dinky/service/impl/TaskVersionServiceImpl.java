@@ -67,6 +67,7 @@ public class TaskVersionServiceImpl extends SuperServiceImpl<TaskVersionMapper, 
         BeanUtil.copyProperties(task, taskVersionConfigureDTO);
         taskVersionConfigureDTO.setConfigJson(JSONUtil.toJsonStr(task.getConfigJson()));
 
+        taskVersionConfigureDTO.setConfigJson(JSONUtil.toJsonStr(task.getConfigJson()));
         taskVersion.setTaskConfigure(taskVersionConfigureDTO);
         taskVersion.setTaskId(taskVersion.getId());
         taskVersion.setId(null);

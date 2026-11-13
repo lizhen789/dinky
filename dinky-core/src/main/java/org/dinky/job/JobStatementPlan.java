@@ -68,8 +68,7 @@ public class JobStatementPlan {
             jobStatementList.get(executableIndex).asFinalExecutableStatement();
         } else {
             // If there is no INSERT/CTAS/RTAS/CALL statement, use the first SELECT/WITH/SHOW/DESC SQL statement as the
-            // final
-            // statement.
+            // final statement.
             for (int i = 0; i < jobStatementList.size(); i++) {
                 if (jobStatementList.get(i).getStatementType().equals(JobStatementType.SQL)) {
                     jobStatementList.get(i).asFinalExecutableStatement();

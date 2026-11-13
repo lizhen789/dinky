@@ -41,7 +41,6 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class AbstractJobRunner implements JobRunner {
 
     protected JobManager jobManager;
-
     protected Executor executor;
 
     public Optional<JobClient> execute(JobStatement jobStatement) throws Exception {

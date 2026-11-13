@@ -254,7 +254,13 @@ export const SqlTask = memo((props: FlinkSqlProps & any) => {
         });
         setOriginStatementValue(sqlConvertForm?.initSqlStatement ?? '');
         updateCenterTab({ ...props.tabData, params: newParams });
-        if (params?.statement && params?.statement !== sqlConvertForm?.initSqlStatement) {
+        if (
+          params?.statement &&
+          !(
+            params?.statement == sqlConvertForm?.initSqlStatement ||
+            params?.statement == taskDetail?.statement
+          )
+        ) {
           setDiff([
             { key: 'statement', server: sqlConvertForm?.initSqlStatement, cache: params.statement }
           ]);
@@ -714,7 +720,7 @@ export const SqlTask = memo((props: FlinkSqlProps & any) => {
         JOB_LIFE_CYCLE.DEVELOP
       );
       // 校验是否成功
-      currentState.step = res && res.data ?  JOB_LIFE_CYCLE.DEVELOP : JOB_LIFE_CYCLE.PUBLISH;
+      currentState.step = res && res.data ? JOB_LIFE_CYCLE.DEVELOP : JOB_LIFE_CYCLE.PUBLISH;
     } else {
       await handleSave();
       const result = await changeTaskLife(

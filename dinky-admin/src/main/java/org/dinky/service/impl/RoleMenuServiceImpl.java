@@ -39,6 +39,7 @@ import cn.hutool.core.collection.CollUtil;
 
 @Service
 public class RoleMenuServiceImpl extends SuperServiceImpl<RoleMenuMapper, RoleMenu> implements RoleMenuService {
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Result<Void> assignMenuToRole(AssignMenuToRoleDTO assignMenuToRoleDto) {

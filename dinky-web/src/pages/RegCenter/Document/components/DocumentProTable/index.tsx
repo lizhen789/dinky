@@ -171,7 +171,10 @@ const DocumentTableList: React.FC = () => {
       hideInDescriptions: true,
       valueType: 'select',
       valueEnum: Object.fromEntries(
-        STATUS_MAPPING().map(item => [item.value, { text: item.text, status: item.value === 1 ? 'Success' : 'Error' }])
+        STATUS_MAPPING().map((item) => [
+          item.value,
+          { text: item.text, status: item.value === 1 ? 'Success' : 'Error' }
+        ])
       ),
       render: (_, record) => {
         return (

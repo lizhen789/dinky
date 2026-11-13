@@ -87,7 +87,6 @@ public class JobDDLRunner extends AbstractJobRunner {
 
     @Override
     public void run(JobStatement jobStatement) throws Exception {
-        jobManager.setCurrentSql(jobStatement.getStatement());
         switch (jobStatement.getSqlType()) {
             case ADD:
                 executeAdd(jobStatement.getStatement());

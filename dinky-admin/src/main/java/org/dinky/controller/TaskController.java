@@ -317,7 +317,6 @@ public class TaskController {
     @PostMapping("/flinkJarSqlConvertForm")
     @ApiOperation("FlinkJar SqlConvertForm")
     public Result<FlinkJarSqlConvertVO> flinkJarSqlConvertForm(@RequestBody TaskDTO taskDTO) {
-
         String sqlStatement = taskDTO.getStatement();
         String[] statements = SqlUtil.getStatements(sqlStatement);
         FlinkJarSqlConvertVO flinkJarSqlConvertVO = new FlinkJarSqlConvertVO();
@@ -326,6 +325,7 @@ public class TaskController {
             flinkJarSqlConvertVO.setInitSqlStatement(sqlStatement);
             return Result.succeed(flinkJarSqlConvertVO);
         }
+
         Integer lastExecuteJarSqlStatementIndex = null;
         for (int i = 0; i < statements.length; i++) {
             if (ExecuteJarParseStrategyUtil.find(statements[i])) {
@@ -341,6 +341,7 @@ public class TaskController {
         flinkJarSqlConvertVO.setJarSubmitParam(info);
         // English: Only clear the 'Execute Jar' part of the original sqlStatement, while retaining all other
         // statements.
+        // 中文： 只清理 Execute Jar 的语句，保留其他各种语句与注释
         String sql = ExecuteJarParseStrategyUtil.removeExecuteJarStatement(sqlStatement);
         flinkJarSqlConvertVO.setInitSqlStatement(sql);
         return Result.succeed(flinkJarSqlConvertVO);

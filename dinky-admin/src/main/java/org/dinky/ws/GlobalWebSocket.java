@@ -89,6 +89,11 @@ public class GlobalWebSocket {
 
     @OnClose
     public void onClose(Session session) {
+        try {
+            session.close();
+        } catch (IOException e) {
+            log.error("close session error", e);
+        }
         TOPICS.remove(session);
         try {
             session.close();

@@ -58,7 +58,6 @@ public class SqlUtil {
         if (Asserts.isNullString(sql)) {
             return new String[0];
         }
-
         String sqlWithoutNote = removeNote(sql);
         ArrayList<String> statements = new ArrayList<>();
         int start = 0;
