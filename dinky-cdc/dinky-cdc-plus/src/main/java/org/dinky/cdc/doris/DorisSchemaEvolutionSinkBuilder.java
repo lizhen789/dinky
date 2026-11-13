@@ -19,18 +19,8 @@
 
 package org.dinky.cdc.doris;
 
-import org.dinky.assertion.Asserts;
-import org.dinky.cdc.AbstractSinkBuilder;
-import org.dinky.cdc.SinkBuilder;
-import org.dinky.data.model.FlinkCDCConfig;
-import org.dinky.data.model.Schema;
-import org.dinky.data.model.Table;
-import org.dinky.executor.CustomTableEnvironment;
-
 import org.apache.doris.flink.cfg.DorisExecutionOptions;
 import org.apache.doris.flink.cfg.DorisOptions;
-import org.apache.doris.flink.cfg.DorisReadOptions;
-import org.apache.doris.flink.sink.DorisSink;
 import org.apache.doris.flink.sink.writer.serializer.JsonDebeziumSchemaSerializer;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
@@ -38,6 +28,13 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.ProcessFunction;
 import org.apache.flink.util.Collector;
 import org.apache.flink.util.OutputTag;
+import org.dinky.assertion.Asserts;
+import org.dinky.cdc.AbstractSinkBuilder;
+import org.dinky.cdc.SinkBuilder;
+import org.dinky.data.model.FlinkCDCConfig;
+import org.dinky.data.model.Schema;
+import org.dinky.data.model.Table;
+import org.dinky.executor.CustomTableEnvironment;
 
 import java.io.Serializable;
 import java.util.LinkedHashMap;
@@ -173,20 +170,10 @@ public class DorisSchemaEvolutionSinkBuilder extends AbstractSinkBuilder impleme
                         Boolean.valueOf(sink.get(DorisSinkOptions.SINK_USE_NEW_SCHEMA_CHANGE.key())));
             }
 
-            DorisSink.Builder<String> builder = DorisSink.builder();
-            builder.setDorisReadOptions(DorisReadOptions.builder().build())
-                    .setDorisExecutionOptions(executionBuilder.build())
-                    .setDorisOptions(dorisOptions)
-                    .setSerializer(jsonDebeziumSchemaSerializerBuilder
-                            .setDorisOptions(dorisOptions)
-                            .build());
-
-            process.getSideOutput(v)
-                    .rebalance()
-                    .sinkTo(builder.build())
-                    .name(String.format(
-                            "Doris Schema Evolution Sink(table=[%s.%s])",
-                            getSinkSchemaName(table), getSinkTableName(table)));
+            // TODO(Flink 2.3): Doris connector 24.0.1 implements sink2 interfaces removed in
+            // Flink 2.3. Restore the DorisSink builder and sinkTo(...) after upgrading it.
+            throw new UnsupportedOperationException(
+                    "Doris connector 24.0.1 is incompatible with Flink 2.3; upgrade the connector first.");
         });
     }
 

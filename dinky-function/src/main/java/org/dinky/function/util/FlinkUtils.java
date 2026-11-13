@@ -19,10 +19,11 @@
 
 package org.dinky.function.util;
 
-import org.apache.flink.runtime.util.EnvironmentInformation;
-
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
+import org.apache.flink.runtime.util.EnvironmentInformation;
+
+import java.util.List;
 
 /** @since 0.6.8 */
 public class FlinkUtils {
@@ -32,11 +33,18 @@ public class FlinkUtils {
     }
 
     /**
-     * @param version flink version。如：1.14.6
-     * @return flink 大版本，如 14
+     * @param version flink version。如：1.20.2、2.3.0
+     * @return flink 大版本号。1.x 返回次版本号（1.20.2 -&gt; 20）；
+     *     2.x 起返回主版本与次版本组合的可比较整数（2.3.0 -&gt; 203），避免 2.x 被解析为比 1.20 更小的版本
      */
     public static String getFlinkBigVersion(String version) {
-        return StrUtil.split(version, ".").get(1);
+        List<String> segments = StrUtil.split(version, ".");
+        if (segments.size() < 2) {
+            return version;
+        }
+        int major = Convert.toInt(segments.get(0), 0);
+        int minor = Convert.toInt(segments.get(1), 0);
+        return major >= 2 ? String.valueOf(major * 100 + minor) : segments.get(1);
     }
 
     /** @return 获取当前 flink 大版本 */

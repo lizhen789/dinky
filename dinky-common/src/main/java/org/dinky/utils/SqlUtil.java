@@ -22,12 +22,12 @@ package org.dinky.utils;
 import org.dinky.assertion.Asserts;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -103,30 +103,59 @@ public class SqlUtil {
         return sql.replaceAll("#\\{" + name + "\\}", value);
     }*/
 
+    private static final Pattern SPEL_PARAM_PATTERN = Pattern.compile("#\\{([^{}]*)\\}");
+
+    public static String replaceAllParam(String sql, String name, String value) {
+        return sql.replaceAll("\\$\\{" + name + "}", value);
+    }
+
+    private static final ExpressionParser parser = new SpelExpressionParser();
+
     public static String replaceAllParam(String sql, Map<String, String> values) {
         if (Asserts.isNullString(sql)) {
             return "";
         }
         EvaluationContext context = new StandardEvaluationContext(values);
         for (Map.Entry<String, String> entry : values.entrySet()) {
-            sql = replaceAllParam(sql, entry.getKey(), entry.getValue());
-            context.setVariable(entry.getKey(), entry.getValue());
+            String value = entry.getValue() == null ? "" : entry.getValue();
+            sql = replaceAllParam(sql, entry.getKey(), value);
+            sql = sql.replace("#{" + entry.getKey() + "}", value);
+            context.setVariable(entry.getKey(), value);
         }
         return replaceAllParamSPEL(sql, context);
     }
 
-    public static String replaceAllParam(String sql, String name, String value) {
-        return sql.replaceAll("\\$\\{" + name + "}", value);
-    }
-
-    private static final TemplateParserContext template = new TemplateParserContext();
-    private static final ExpressionParser parser = new SpelExpressionParser();
+    /**
+     * Replaces resolvable #{...} placeholders. Empty, undefined or non-evaluable placeholders are
+     * kept verbatim so that user supplied Flink configuration never breaks the whole statement.
+     */
     public static String replaceAllParamSPEL(String expressionString, EvaluationContext context) {
-        return (String) parser.parseExpression(expressionString, template).getValue(context);
+        if (expressionString == null) {
+            return null;
+        }
+        Matcher matcher = SPEL_PARAM_PATTERN.matcher(expressionString);
+        StringBuffer result = new StringBuffer();
+        while (matcher.find()) {
+            String expression = matcher.group(1);
+            String replacement = matcher.group(0);
+            if (Asserts.isNotNullString(expression) && !expression.trim().isEmpty()) {
+                try {
+                    Object value = parser.parseExpression(expression).getValue(context);
+                    if (value != null) {
+                        replacement = value.toString();
+                    }
+                } catch (Exception ignored) {
+                    // Keep unresolved placeholders untouched.
+                }
+            }
+            matcher.appendReplacement(result, Matcher.quoteReplacement(replacement));
+        }
+        matcher.appendTail(result);
+        return result.toString();
     }
 
     public static String replaceAllParamSPEL(String expressionString, Object properties) {
-        return (String) parser.parseExpression(expressionString, template).getValue(new StandardEvaluationContext(properties));
+        return replaceAllParamSPEL(expressionString, new StandardEvaluationContext(properties));
     }
 
     public static String addLineNumber(String input) {

@@ -827,9 +827,9 @@ export default {
   'rc.cc.spDirHelp': '对应Savepoint目录，如 hdfs:///flink/savepoint',
   'rc.cc.sqlSubmitJarPath': 'Jar 文件路径',
   'rc.cc.sqlSubmitJarPathHelp':
-    '请输入 Jar 文件路径! eg: hdfs:///dinky/dinky-app-1.20-with-dependencies.jar',
+    '请输入 Jar 文件路径! eg: hdfs:///dinky/dinky-app-2.3-with-dependencies.jar',
   'rc.cc.sqlSubmitJarPathHelpTips':
-    'Yarn 模式下此参数可以设置为: hdfs:///dinky/dinky-app-1.20-with-dependencies.jar 或者 rs:/dinky/dinky-app-1.20-with-dependencies.jar 如果设置为 rs:/ 协议,则需要将该jar包上传到 Dinky 的资源中心中,然后填写该路径。K8s 模式下仅支持 local:// 协议',
+    'Yarn 模式下此参数可以设置为: hdfs:///dinky/dinky-app-2.3-with-dependencies.jar 或者 rs:/dinky/dinky-app-2.3-with-dependencies.jar 如果设置为 rs:/ 协议,则需要将该jar包上传到 Dinky 的资源中心中,然后填写该路径。K8s 模式下仅支持 local:// 协议',
   'rc.cc.start': '启动 Session 集群',
   'rc.cc.submitSqlConfig': '提交 FlinkSQL 配置项',
   'rc.cc.tmHeap': 'TaskManager 堆内存',

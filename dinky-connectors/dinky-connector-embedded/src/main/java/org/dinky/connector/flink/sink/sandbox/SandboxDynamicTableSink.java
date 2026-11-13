@@ -19,15 +19,14 @@
 
 package org.dinky.connector.flink.sink.sandbox;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.table.connector.ChangelogMode;
 import org.apache.flink.table.connector.sink.DynamicTableSink;
-import org.apache.flink.table.connector.sink.SinkFunctionProvider;
+import org.apache.flink.table.connector.sink.legacy.SinkFunctionProvider;
 import org.apache.flink.table.types.logical.RowType;
 
 import java.io.Serializable;
 import java.util.Objects;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class SandboxDynamicTableSink implements DynamicTableSink, Serializable {

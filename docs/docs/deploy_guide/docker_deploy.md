@@ -16,7 +16,7 @@ title: Docker 部署
 ##  Docker启动
 使用 H2 本地数据库快速启动
 ```shell
-docker run --restart=always -p 8888:8888  --name dinky  dinkydocker/dinky-standalone-server:1.1.0-flink1.20
+docker run --restart=always -p 8888:8888  --name dinky  dinkydocker/dinky-standalone-server:1.1.0-flink2.3
 
 ```
 使用 外部mysql数据库
@@ -29,7 +29,7 @@ docker run --restart=always -p 8888:8888 \
   -e MYSQL_USERNAME=dinky \
   -e MYSQL_PASSWORD=dinky \
   -v /opt/lib:/opt/dinky/customJar/ \ 
-  dinkydocker/dinky-standalone-server:1.1.0-flink1.20
+  dinkydocker/dinky-standalone-server:1.1.0-flink2.3
 
 ```
 :::tip 说明
@@ -47,7 +47,7 @@ docker run --restart=always -p 8888:8888 \
   -e POSTGRES_USER=dinky \
   -e POSTGRES_PASSWORD=dinky \
   -v /opt/lib:/opt/dinky/customJar/ \ 
-  dinkydocker/dinky-standalone-server:1.1.0-flink1.20
+  dinkydocker/dinky-standalone-server:1.1.0-flink2.3
 ```
 ---
 ### 使用docker-compose 
@@ -67,7 +67,7 @@ ls -al
 #定义dinky版本号
 DINKY_VERSION=1.0.3
 #定义Flink版本（不要写小版本号）
-FLINK_VERSION=1.20
+FLINK_VERSION=2.3
 
 # 自定义jar包依赖本地路径（例如：mysql驱动）
 CUSTOM_JAR_PATH=/opt/dinky/extends/
@@ -116,7 +116,7 @@ docker compose --profile standalone -f docker-compose.yml -f docker-compose.dev.
 docker compose --profile ms -f docker-compose.yml -f docker-compose.dev.yml up
 ```
 (适配自身nginx的docker/web/default.conf配置)
-对于 Flink 1.20 版本,需要手动将容器中`/opt/diny/plugin/flink{version}/flink-table-planner-loader*.jar`移除,
+对于 Flink 2.3 版本,需要手动将容器中`/opt/diny/plugin/flink{version}/flink-table-planner-loader*.jar`移除,
 替换为相应版本的flink-table-planner_*.jar文件.
 创建容器时,可映射到容器/opt/diny/customJar文件夹,添加自定义jar包.
 

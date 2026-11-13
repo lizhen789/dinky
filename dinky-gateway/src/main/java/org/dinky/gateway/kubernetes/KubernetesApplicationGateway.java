@@ -19,24 +19,18 @@
 
 package org.dinky.gateway.kubernetes;
 
-import static org.dinky.gateway.kubernetes.utils.DinkyKubernetsConstants.DINKY_K8S_INGRESS_DOMAIN_KEY;
-import static org.dinky.gateway.kubernetes.utils.DinkyKubernetsConstants.DINKY_K8S_INGRESS_ENABLED_KEY;
-
-import org.dinky.assertion.Asserts;
-import org.dinky.context.FlinkUdfPathContextHolder;
-import org.dinky.data.enums.GatewayType;
-import org.dinky.data.model.SystemConfiguration;
-import org.dinky.executor.ClusterDescriptorAdapterImpl;
-import org.dinky.gateway.config.AppConfig;
-import org.dinky.gateway.exception.GatewayException;
-import org.dinky.gateway.kubernetes.ingress.DinkyKubernetesIngress;
-import org.dinky.gateway.kubernetes.utils.IgnoreNullRepresenter;
-import org.dinky.gateway.kubernetes.utils.K8sClientHelper;
-import org.dinky.gateway.model.ingress.JobDetails;
-import org.dinky.gateway.model.ingress.JobOverviewInfo;
-import org.dinky.gateway.result.GatewayResult;
-import org.dinky.gateway.result.KubernetesResult;
-
+import cn.hutool.core.date.SystemClock;
+import cn.hutool.core.text.StrFormatter;
+import cn.hutool.http.HttpResponse;
+import cn.hutool.http.HttpStatus;
+import cn.hutool.http.HttpUtil;
+import com.alibaba.fastjson2.JSONObject;
+import io.fabric8.kubernetes.api.model.ContainerStatus;
+import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.apps.Deployment;
+import io.fabric8.kubernetes.api.model.networking.v1.Ingress;
+import io.fabric8.kubernetes.client.KubernetesClient;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -51,30 +45,27 @@ import org.apache.flink.kubernetes.configuration.KubernetesConfigOptions;
 import org.apache.flink.kubernetes.kubeclient.FlinkKubeClient;
 import org.apache.flink.kubernetes.utils.Constants;
 import org.apache.flink.runtime.client.JobStatusMessage;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-
+import org.dinky.assertion.Asserts;
+import org.dinky.context.FlinkUdfPathContextHolder;
+import org.dinky.data.enums.GatewayType;
+import org.dinky.data.model.SystemConfiguration;
+import org.dinky.executor.ClusterDescriptorAdapterImpl;
+import org.dinky.gateway.config.AppConfig;
+import org.dinky.gateway.exception.GatewayException;
+import org.dinky.gateway.kubernetes.ingress.DinkyKubernetesIngress;
+import org.dinky.gateway.kubernetes.utils.IgnoreNullRepresenter;
+import org.dinky.gateway.kubernetes.utils.K8sClientHelper;
+import org.dinky.gateway.model.ingress.JobDetails;
+import org.dinky.gateway.model.ingress.JobOverviewInfo;
+import org.dinky.gateway.result.GatewayResult;
+import org.dinky.gateway.result.KubernetesResult;
 import org.yaml.snakeyaml.Yaml;
 
-import com.alibaba.fastjson2.JSONObject;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
-import cn.hutool.core.date.SystemClock;
-import cn.hutool.core.text.StrFormatter;
-import cn.hutool.http.HttpResponse;
-import cn.hutool.http.HttpStatus;
-import cn.hutool.http.HttpUtil;
-import io.fabric8.kubernetes.api.model.ContainerStatus;
-import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.api.model.apps.Deployment;
-import io.fabric8.kubernetes.api.model.networking.v1.Ingress;
-import io.fabric8.kubernetes.client.KubernetesClient;
-import lombok.extern.slf4j.Slf4j;
+import static org.dinky.gateway.kubernetes.utils.DinkyKubernetsConstants.DINKY_K8S_INGRESS_DOMAIN_KEY;
+import static org.dinky.gateway.kubernetes.utils.DinkyKubernetsConstants.DINKY_K8S_INGRESS_ENABLED_KEY;
 
 /**
  * KubernetesApplicationGateway
@@ -115,9 +106,9 @@ public class KubernetesApplicationGateway extends KubernetesGateway {
                 long ingressStart = SystemClock.now();
                 DinkyKubernetesIngress ingress = new DinkyKubernetesIngress(k8sClientHelper);
                 ingress.configureIngress(
-                        k8sClientHelper.getConfiguration().getString(KubernetesConfigOptions.CLUSTER_ID),
+                        k8sClientHelper.getConfiguration().get(KubernetesConfigOptions.CLUSTER_ID),
                         ingressDomain,
-                        k8sClientHelper.getConfiguration().getString(KubernetesConfigOptions.NAMESPACE));
+                        k8sClientHelper.getConfiguration().get(KubernetesConfigOptions.NAMESPACE));
                 log.info("Create dinky ingress service success, cost time:{} ms", SystemClock.now() - ingressStart);
                 kubernetesResult = waitForJmAndJobStartByIngress(kubernetesClient, deployment, clusterClient);
             } else {
@@ -232,7 +223,7 @@ public class KubernetesApplicationGateway extends KubernetesGateway {
                     JobStatusMessage job = jobList.stream().findFirst().get();
                     JobStatus jobStatus = client.getJobStatus(job.getJobId()).get();
                     // To create a cluster ID, you need to combine the cluster ID with the jobID to ensure uniqueness
-                    String cid = configuration.getString(KubernetesConfigOptions.CLUSTER_ID)
+                    String cid = configuration.get(KubernetesConfigOptions.CLUSTER_ID)
                             + job.getJobId().toHexString();
                     logger.info("Success get job status:{}", jobStatus);
                     return result.setWebURL(client.getWebInterfaceURL())
@@ -288,7 +279,7 @@ public class KubernetesApplicationGateway extends KubernetesGateway {
                     JobOverviewInfo jobOverviewInfo =
                             jobDetails.getJobs().stream().findFirst().get();
                     // To create a cluster ID, you need to combine the cluster ID with the jobID to ensure uniqueness
-                    String cid = configuration.getString(KubernetesConfigOptions.CLUSTER_ID) + jobOverviewInfo.getJid();
+                    String cid = configuration.get(KubernetesConfigOptions.CLUSTER_ID) + jobOverviewInfo.getJid();
                     logger.info("Success get job status: {}", jobOverviewInfo.getState());
 
                     return result.setJids(Collections.singletonList(jobOverviewInfo.getJid()))

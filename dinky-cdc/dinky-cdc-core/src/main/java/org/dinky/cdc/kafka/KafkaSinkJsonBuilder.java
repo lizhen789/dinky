@@ -19,6 +19,16 @@
 
 package org.dinky.cdc.kafka;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import org.apache.flink.streaming.api.datastream.DataStreamSource;
+import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
+import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.functions.ProcessFunction;
+import org.apache.flink.table.types.logical.LogicalType;
+import org.apache.flink.util.Collector;
 import org.dinky.assertion.Asserts;
 import org.dinky.cdc.AbstractSinkBuilder;
 import org.dinky.cdc.SinkBuilder;
@@ -28,15 +38,6 @@ import org.dinky.data.model.Schema;
 import org.dinky.data.model.Table;
 import org.dinky.executor.CustomTableEnvironment;
 
-import org.apache.flink.api.common.serialization.SimpleStringSchema;
-import org.apache.flink.streaming.api.datastream.DataStreamSource;
-import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
-import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.functions.ProcessFunction;
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
-import org.apache.flink.table.types.logical.LogicalType;
-import org.apache.flink.util.Collector;
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -44,11 +45,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 
 public class KafkaSinkJsonBuilder extends AbstractSinkBuilder implements Serializable {
 
@@ -194,10 +190,13 @@ public class KafkaSinkJsonBuilder extends AbstractSinkBuilder implements Seriali
                         }
                     }
 
-                    stringOperator.addSink(
-                            new FlinkKafkaProducer<String>(topic, new SimpleStringSchema(), getProperties()));
+                    // TODO(Flink 2.3): FlinkKafkaProducer relies on the removed V1 sink API.
+                    throw new UnsupportedOperationException(
+                            "Kafka sink connector 3.4.0-1.20 is incompatible with Flink 2.3; upgrade the connector first.");
                 }
             }
+        } catch (UnsupportedOperationException ex) {
+            throw ex;
         } catch (Exception ex) {
             logger.error("kafka sink error:", ex);
         }

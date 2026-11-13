@@ -19,15 +19,14 @@
 
 package org.dinky.connector.mock.sink;
 
-import org.dinky.constant.FlinkConstant;
-
 import org.apache.flink.api.common.accumulators.SerializedListAccumulator;
+import org.apache.flink.api.common.functions.OpenContext;
 import org.apache.flink.api.common.typeutils.base.MapSerializer;
 import org.apache.flink.api.common.typeutils.base.StringSerializer;
-import org.apache.flink.configuration.Configuration;
-import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
+import org.apache.flink.streaming.api.functions.sink.legacy.RichSinkFunction;
 import org.apache.flink.table.data.RowData;
 import org.apache.flink.table.types.logical.RowType;
+import org.dinky.constant.FlinkConstant;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -48,9 +47,9 @@ public class MockSinkFunction extends RichSinkFunction<RowData> {
     }
 
     @Override
-    public void open(Configuration parameters) throws Exception {
+    public void open(OpenContext openContext) throws Exception {
         getRuntimeContext().addAccumulator(tableIdentifier, rowDataList);
-        super.open(parameters);
+        super.open(openContext);
     }
 
     @Override

@@ -17,7 +17,7 @@
  *
  */
 
-import {l} from '@/utils/intl';
+import { l } from '@/utils/intl';
 
 export const DOCUMENT_CATEGORY_ENUMS = {
   Variable: { text: 'Variable', value: 'Variable' },
@@ -81,8 +81,8 @@ export const DOCUMENT_FUNCTION_TYPE_ENUMS = {
  */
 export const VERSIONS = [
   {
-    text: 'Flink-1.20',
-    value: '1.20'
+    text: 'Flink-2.3',
+    value: '2.3'
   },
   {
     text: 'All Versions',

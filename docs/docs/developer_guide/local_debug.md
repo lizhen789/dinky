@@ -119,7 +119,7 @@ Install/Package 过程中报错代码格式化问题,请参考 [代码格式化]
 
 - 其他差异化配置为自己的 Maven 的 settings.xml 文件中的 profile 配置,请忽略
 - 如果无JDK11环境, 默认使用JDK8,如果需要使用JDK11,请在IDEA中配置JDK11环境
-- Dinky 仅支持 Flink 1.20，不再提供 Flink 版本相关的 Maven Profile
+- Dinky 仅支持 Flink 2.3，不再提供 Flink 版本相关的 Maven Profile
 - 注意 Profile 是否是灰色,如果是灰色,说明此 Profile 被默认选中了,请根据自己的需求进行勾选或者取消勾选
 
 :::

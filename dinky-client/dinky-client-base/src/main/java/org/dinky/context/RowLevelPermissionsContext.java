@@ -21,7 +21,15 @@ package org.dinky.context;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-/** RowLevelPermissionsContext */
+/**
+ * RowLevelPermissionsContext
+ *
+ * <p>TODO(Flink 2.3): the custom {@code org.apache.calcite.sql.SqlSelect} patch that consumed this
+ * context was written against the Calcite bundled with Flink 1.20 and is incompatible with Flink
+ * 2.3 (SqlSelect now has a qualify operand). It was removed so the official parser classes are
+ * used; row-level permission filtering must be re-implemented against the Flink 2.3 Calcite APIs
+ * before it takes effect again.
+ */
 public class RowLevelPermissionsContext {
 
     private static final ThreadLocal<ConcurrentHashMap<String, String>> ROW_LEVEL_PERMISSIONS_CONTEXT =

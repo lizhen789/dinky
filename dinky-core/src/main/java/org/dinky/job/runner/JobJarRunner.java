@@ -19,6 +19,17 @@
 
 package org.dinky.job.runner;
 
+import cn.hutool.core.lang.Assert;
+import cn.hutool.core.text.StrFormatter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.flink.api.common.Plan;
+import org.apache.flink.api.dag.Pipeline;
+import org.apache.flink.configuration.Configuration;
+import org.apache.flink.configuration.PipelineOptions;
+import org.apache.flink.configuration.StateRecoveryOptions;
+import org.apache.flink.core.execution.JobClient;
+import org.apache.flink.runtime.jobgraph.JobGraph;
+import org.apache.flink.streaming.api.graph.StreamGraph;
 import org.dinky.assertion.Asserts;
 import org.dinky.classloader.DinkyClassLoader;
 import org.dinky.data.exception.DinkyException;
@@ -40,33 +51,12 @@ import org.dinky.trans.parse.AddFileSqlParseStrategy;
 import org.dinky.trans.parse.AddJarSqlParseStrategy;
 import org.dinky.trans.parse.ExecuteJarParseStrategy;
 import org.dinky.trans.parse.SetSqlParseStrategy;
-import org.dinky.utils.DinkyClassLoaderUtil;
-import org.dinky.utils.FlinkStreamEnvironmentUtil;
-import org.dinky.utils.LogUtil;
-import org.dinky.utils.SqlUtil;
-import org.dinky.utils.URLUtils;
-
-import org.apache.flink.api.common.Plan;
-import org.apache.flink.api.dag.Pipeline;
-import org.apache.flink.configuration.Configuration;
-import org.apache.flink.configuration.PipelineOptions;
-import org.apache.flink.core.execution.JobClient;
-import org.apache.flink.runtime.jobgraph.JobGraph;
-import org.apache.flink.runtime.jobgraph.SavepointConfigOptions;
-import org.apache.flink.streaming.api.graph.StreamGraph;
+import org.dinky.utils.*;
 
 import java.io.File;
 import java.net.URL;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import cn.hutool.core.lang.Assert;
-import cn.hutool.core.text.StrFormatter;
-import lombok.extern.slf4j.Slf4j;
+import java.util.*;
 
 @Slf4j
 public class JobJarRunner extends AbstractJobRunner {
@@ -174,10 +164,10 @@ public class JobJarRunner extends AbstractJobRunner {
             Map<String, String> configJson = jobManager.getConfig().getConfigJson();
             if (Asserts.isNotNullString(savePointPath)
                     || (Asserts.isNotNull(configJson)
-                            && Asserts.isNotNullString(configJson.get(SavepointConfigOptions.SAVEPOINT_PATH.key())))) {
+                    && Asserts.isNotNullString(configJson.get(StateRecoveryOptions.SAVEPOINT_PATH.key())))) {
                 String effectivePath = Asserts.isNotNullString(savePointPath)
                         ? savePointPath
-                        : configJson.get(SavepointConfigOptions.SAVEPOINT_PATH.key());
+                        : configJson.get(StateRecoveryOptions.SAVEPOINT_PATH.key());
                 JarSubmitParam submitParam = JarSubmitParam.getInfo(jobStatement.getStatement());
                 boolean allowNonRestored = submitParam.getAllowNonRestoredState();
                 log.info(
@@ -187,8 +177,8 @@ public class JobJarRunner extends AbstractJobRunner {
                 // 设置到 getRootConfiguration()，executeAsync 会以它为基础创建拷贝
                 Configuration rootConfiguration =
                         executor.getCustomTableEnvironment().getRootConfiguration();
-                rootConfiguration.set(SavepointConfigOptions.SAVEPOINT_PATH, effectivePath);
-                rootConfiguration.set(SavepointConfigOptions.SAVEPOINT_IGNORE_UNCLAIMED_STATE, allowNonRestored);
+                rootConfiguration.set(StateRecoveryOptions.SAVEPOINT_PATH, effectivePath);
+                rootConfiguration.set(StateRecoveryOptions.SAVEPOINT_IGNORE_UNCLAIMED_STATE, allowNonRestored);
             }
         }
         return pipeline;

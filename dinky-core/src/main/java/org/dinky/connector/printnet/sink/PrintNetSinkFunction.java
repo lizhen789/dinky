@@ -19,9 +19,10 @@
 
 package org.dinky.connector.printnet.sink;
 
+import lombok.extern.slf4j.Slf4j;
+import org.apache.flink.api.common.functions.OpenContext;
 import org.apache.flink.api.common.serialization.SerializationSchema;
-import org.apache.flink.configuration.Configuration;
-import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
+import org.apache.flink.streaming.api.functions.sink.legacy.RichSinkFunction;
 import org.apache.flink.table.connector.sink.DynamicTableSink;
 import org.apache.flink.table.data.RowData;
 
@@ -30,8 +31,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class PrintNetSinkFunction extends RichSinkFunction<RowData> {
@@ -63,8 +62,8 @@ public class PrintNetSinkFunction extends RichSinkFunction<RowData> {
     }
 
     @Override
-    public void open(Configuration parameters) throws Exception {
-        super.open(parameters);
+    public void open(OpenContext openContext) throws Exception {
+        super.open(openContext);
         if (serializer != null) {
             serializer.open(null);
         }

@@ -38,33 +38,20 @@ package org.dinky.cdc.kafka;
  *
  */
 
+import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.datastream.DataStreamSource;
+import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.table.data.RowData;
+import org.apache.flink.table.types.logical.LogicalType;
 import org.dinky.assertion.Asserts;
 import org.dinky.cdc.AbstractSinkBuilder;
 import org.dinky.cdc.SinkBuilder;
 import org.dinky.data.model.FlinkCDCConfig;
-import org.dinky.data.model.Schema;
 import org.dinky.data.model.Table;
 import org.dinky.executor.CustomTableEnvironment;
 
-import org.apache.flink.api.common.serialization.SimpleStringSchema;
-import org.apache.flink.connector.base.DeliveryGuarantee;
-import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchema;
-import org.apache.flink.connector.kafka.sink.KafkaSink;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.flink.streaming.api.datastream.DataStream;
-import org.apache.flink.streaming.api.datastream.DataStreamSource;
-import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
-import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.functions.ProcessFunction;
-import org.apache.flink.table.data.RowData;
-import org.apache.flink.table.types.logical.LogicalType;
-import org.apache.flink.util.Collector;
-import org.apache.flink.util.OutputTag;
-
 import java.io.Serializable;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -113,95 +100,19 @@ public class KafkaSinkBuilder extends AbstractSinkBuilder implements Serializabl
         }
     }
 
+    private static UnsupportedOperationException unsupportedKafkaSink() {
+        return new UnsupportedOperationException(
+                "Kafka sink connector 3.4.0-1.20 is incompatible with Flink 2.3; upgrade the connector first.");
+    }
+
+    // TODO(Flink 2.3): KafkaSink 3.4.0-1.20 implements sink2 interfaces that were removed in
+    // Flink 2.3 (TwoPhaseCommittingSink/StatefulSink). Restore the original sinkTo(...) logic
+    // once a Flink 2.3 compatible Kafka connector is used.
     private void singleTopicSink(DataStreamSource<String> dataStreamSource) {
-        org.apache.flink.connector.kafka.sink.KafkaSinkBuilder<String> kafkaSinkBuilder = KafkaSink.<String>builder()
-                .setBootstrapServers(config.getSink().get("brokers"))
-                .setRecordSerializer(KafkaRecordSerializationSchema.builder()
-                        .setTopic(config.getSink().get("topic"))
-                        .setValueSerializationSchema(new SimpleStringSchema())
-                        .build())
-                .setTransactionalIdPrefix(
-                        config.getSink().get("transactional.id.prefix") == null
-                                ? ""
-                                : config.getSink().get("transactional.id.prefix"))
-                .setDeliverGuarantee(DeliveryGuarantee.valueOf(
-                        config.getSink().get("delivery.guarantee") == null
-                                ? "NONE"
-                                : config.getSink().get("delivery.guarantee")));
-        if (!kafkaProducerConfig.isEmpty()) {
-            kafkaSinkBuilder.setKafkaProducerConfig(kafkaProducerConfig);
-        }
-        KafkaSink<String> kafkaSink = kafkaSinkBuilder.build();
-        dataStreamSource.sinkTo(kafkaSink);
+        throw unsupportedKafkaSink();
     }
 
     private void multipleTopicSink(DataStreamSource<String> dataStreamSource) {
-        final Map<Table, OutputTag<String>> tagMap = new LinkedHashMap<>();
-        final Map<String, Table> tableMap = new LinkedHashMap<>();
-        final Map<String, String> tableTopicMap = this.getTableTopicMap();
-        final ObjectMapper objectMapper = new ObjectMapper();
-
-        SingleOutputStreamOperator<Map> mapOperator = deserialize(dataStreamSource);
-        logger.info("Build deserialize successful...");
-
-        for (Schema schema : getSortedSchemaList()) {
-            for (Table table : schema.getTables()) {
-                String sinkTableName = getSinkTableName(table);
-                OutputTag<String> outputTag = new OutputTag<String>(sinkTableName) {};
-                tagMap.put(table, outputTag);
-                tableMap.put(table.getSchemaTableName(), table);
-            }
-        }
-        partitionByTableAndPrimarykey(mapOperator, tableMap);
-        logger.info("Build partitionBy successful...");
-        final String schemaFieldName = config.getSchemaFieldName();
-        SingleOutputStreamOperator<String> process = mapOperator.process(new ProcessFunction<Map, String>() {
-            @Override
-            public void processElement(Map map, ProcessFunction<Map, String>.Context ctx, Collector<String> out)
-                    throws Exception {
-                LinkedHashMap source = (LinkedHashMap) map.get("source");
-                try {
-                    String result = objectMapper.writeValueAsString(map);
-                    Table table = tableMap.get(source.get(schemaFieldName).toString() + "."
-                            + source.get("table").toString());
-                    OutputTag<String> outputTag = tagMap.get(table);
-                    ctx.output(outputTag, result);
-                } catch (Exception e) {
-                    out.collect(objectMapper.writeValueAsString(map));
-                }
-            }
-        });
-        logger.info("Build shunt successful...");
-        tagMap.forEach((k, v) -> {
-            String topic = getSinkTableName(k);
-            if (tableTopicMap != null) {
-                String tableName = k.getName();
-                String newTopic = tableTopicMap.get(tableName);
-                if (Asserts.isNotNullString(newTopic)) {
-                    topic = newTopic;
-                }
-            }
-            org.apache.flink.connector.kafka.sink.KafkaSinkBuilder<String> kafkaSinkBuilder =
-                    KafkaSink.<String>builder()
-                            .setBootstrapServers(config.getSink().get("brokers"))
-                            .setRecordSerializer(KafkaRecordSerializationSchema.builder()
-                                    .setTopic(topic)
-                                    .setValueSerializationSchema(new SimpleStringSchema())
-                                    .build())
-                            .setTransactionalIdPrefix(
-                                    config.getSink().get("transactional.id.prefix") == null
-                                            ? ""
-                                            : config.getSink().get("transactional.id.prefix"))
-                            .setDeliverGuarantee(DeliveryGuarantee.valueOf(
-                                    config.getSink().get("delivery.guarantee") == null
-                                            ? "NONE"
-                                            : config.getSink().get("delivery.guarantee")));
-            if (!kafkaProducerConfig.isEmpty()) {
-                kafkaSinkBuilder.setKafkaProducerConfig(kafkaProducerConfig);
-            }
-
-            KafkaSink<String> kafkaSink = kafkaSinkBuilder.build();
-            process.getSideOutput(v).rebalance().sinkTo(kafkaSink).name(topic);
-        });
+        throw unsupportedKafkaSink();
     }
 }

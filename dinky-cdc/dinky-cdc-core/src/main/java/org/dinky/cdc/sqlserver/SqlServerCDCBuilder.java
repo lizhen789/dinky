@@ -19,23 +19,21 @@
 
 package org.dinky.cdc.sqlserver;
 
-import org.dinky.assertion.Asserts;
-import org.dinky.cdc.AbstractCDCBuilder;
-import org.dinky.cdc.CDCBuilder;
-import org.dinky.constant.FlinkParamConstant;
-import org.dinky.data.model.FlinkCDCConfig;
-
 import org.apache.flink.cdc.connectors.base.options.StartupOptions;
 import org.apache.flink.cdc.connectors.sqlserver.SqlServerSource;
 import org.apache.flink.cdc.debezium.JsonDebeziumDeserializationSchema;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.dinky.assertion.Asserts;
+import org.dinky.cdc.AbstractCDCBuilder;
+import org.dinky.cdc.CDCBuilder;
+import org.dinky.constant.FlinkParamConstant;
+import org.dinky.data.model.FlinkCDCConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Properties;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SqlServerCDCBuilder extends AbstractCDCBuilder implements CDCBuilder {
 
@@ -119,7 +117,11 @@ public class SqlServerCDCBuilder extends AbstractCDCBuilder implements CDCBuilde
         }
 
         sourceBuilder.debeziumProperties(debeziumProperties);
-        return env.addSource(sourceBuilder.build(), "SqlServer CDC Source");
+        // TODO(Flink 2.3): CDC 2.3.0's DebeziumSourceFunction is built on the removed V1
+        // SourceFunction API. Restore addSource(sourceBuilder.build(), ...) once a Flink 2.3
+        // compatible CDC connector is available.
+        throw new UnsupportedOperationException(
+                "CDC source connector 2.3.0 is incompatible with Flink 2.3; upgrade the CDC connector first.");
     }
 
     @Override

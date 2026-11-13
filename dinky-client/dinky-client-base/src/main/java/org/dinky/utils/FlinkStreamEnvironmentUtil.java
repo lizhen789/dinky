@@ -19,13 +19,8 @@
 
 package org.dinky.utils;
 
-import static org.apache.flink.util.Preconditions.checkNotNull;
-
-import org.dinky.executor.CustomTableEnvironment;
-
-import org.apache.flink.api.common.Plan;
+import cn.hutool.core.util.ReflectUtil;
 import org.apache.flink.api.dag.Pipeline;
-import org.apache.flink.client.PlanTranslator;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.configuration.DeploymentOptions;
 import org.apache.flink.core.execution.JobClient;
@@ -37,12 +32,13 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.graph.StreamGraph;
 import org.apache.flink.util.ExceptionUtils;
 import org.apache.flink.util.FlinkException;
+import org.dinky.executor.CustomTableEnvironment;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import cn.hutool.core.util.ReflectUtil;
+import static org.apache.flink.util.Preconditions.checkNotNull;
 
 public enum FlinkStreamEnvironmentUtil {
     ;
@@ -120,25 +116,14 @@ public enum FlinkStreamEnvironmentUtil {
     public static String getStreamingPlanAsJSON(Pipeline pipeline) {
         if (pipeline instanceof StreamGraph) {
             return ((StreamGraph) pipeline).getStreamingPlanAsJSON();
-        } else if (pipeline instanceof Plan) {
-            ;
-            PlanTranslator planTranslator = new PlanTranslator();
-            return planTranslator.translateToJSONExecutionPlan(pipeline);
-        } else {
-            throw new IllegalArgumentException("Unknown pipeline type: " + pipeline);
         }
+        throw new IllegalArgumentException("Unknown pipeline type: " + pipeline);
     }
 
     public static JobGraph getJobGraph(Pipeline pipeline, Configuration configuration) {
         if (pipeline instanceof StreamGraph) {
             return ((StreamGraph) pipeline).getJobGraph();
-        } else if (pipeline instanceof Plan) {
-            ;
-            Plan plan = ((Plan) pipeline);
-            PlanTranslator planTranslator = new PlanTranslator();
-            return planTranslator.translateToJobGraph(pipeline, configuration, plan.getDefaultParallelism());
-        } else {
-            throw new IllegalArgumentException("Unknown pipeline type: " + pipeline);
         }
+        throw new IllegalArgumentException("Unknown pipeline type: " + pipeline);
     }
 }

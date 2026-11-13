@@ -2,8 +2,10 @@ package org.apache.flink.table.test.utils;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.flink.configuration.CheckpointingOptions;
+import org.apache.flink.configuration.Configuration;
+import org.apache.flink.configuration.ExternalizedCheckpointRetention;
 import org.apache.flink.streaming.api.CheckpointingMode;
-import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 
@@ -19,9 +21,9 @@ import java.util.concurrent.CountDownLatch;
  */
 public class TestUtil {
     public static StreamExecutionEnvironment getLocalExecutionEnvironment(){
-        // StreamTableEnvironment tEnv = StreamTableEnvironment.create(StreamExecutionEnvironment.createLocalEnvironment());
-        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-//        "decimal.handling.mode", "string"
+        Configuration configuration = new Configuration();
+        configuration.set(CheckpointingOptions.CHECKPOINTS_DIRECTORY, "file:///dist/test/checkpoint");
+        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment(configuration);
         env.enableCheckpointing(10000);
         // 设置模式为exactly-once （这是默认值）
         env.getCheckpointConfig().setCheckpointingMode(CheckpointingMode.EXACTLY_ONCE);
@@ -32,9 +34,8 @@ public class TestUtil {
         // 同一时间只允许进行一个检查点
         env.getCheckpointConfig().setMaxConcurrentCheckpoints(1);
         // cancel后，保留Checkpoint数据，以便根据实际需要恢复到指定的Checkpoint
-        env.getCheckpointConfig().setExternalizedCheckpointCleanup(CheckpointConfig.ExternalizedCheckpointCleanup.RETAIN_ON_CANCELLATION);
-        // scan.incremental.snapshot.enabled
-        env.getCheckpointConfig().setCheckpointStorage("file:///dist/test/checkpoint");
+        env.getCheckpointConfig()
+                .setExternalizedCheckpointRetention(ExternalizedCheckpointRetention.RETAIN_ON_CANCELLATION);
         return env;
     }
 

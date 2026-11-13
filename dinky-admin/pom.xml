@@ -32,7 +32,6 @@
     <name>Dinky : Admin</name>
 
     <properties>
-        <expand.scope>provided</expand.scope>
         <!-- Pac4j 4.x for jdk 8 -->
         <pac4j.version>4.2.0</pac4j.version>
         <postgresql.version>42.5.1</postgresql.version>
@@ -354,7 +353,7 @@
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-core</artifactId>
             <version>${flink.version}</version>
-            <scope>test</scope>
+            <scope>${scope.runtime}</scope>
         </dependency>
         <dependency>
             <groupId>org.powermock</groupId>
@@ -447,13 +446,13 @@
 
         <dependency>
             <groupId>org.dinky</groupId>
-            <artifactId>dinky-client-1.20</artifactId>
+            <artifactId>dinky-client-2.3</artifactId>
             <version>${revision}</version>
             <scope>${scope.runtime}</scope>
         </dependency>
         <dependency>
             <groupId>org.dinky</groupId>
-            <artifactId>dinky-flink-1.20</artifactId>
+            <artifactId>dinky-flink-2.3</artifactId>
             <version>${revision}</version>
             <scope>${scope.runtime}</scope>
         </dependency>
@@ -582,18 +581,5 @@
             </dependencies>
         </profile>
 
-        <profile>
-            <id>dev</id>
-            <properties>
-                <expand.scope>compile</expand.scope>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>prod</id>
-            <properties>
-                <expand.scope>provided</expand.scope>
-            </properties>
-        </profile>
     </profiles>
 </project>

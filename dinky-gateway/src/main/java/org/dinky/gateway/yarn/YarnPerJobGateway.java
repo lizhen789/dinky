@@ -19,30 +19,18 @@
 
 package org.dinky.gateway.yarn;
 
-import org.dinky.assertion.Asserts;
-import org.dinky.constant.CustomerConfigureOptions;
-import org.dinky.data.enums.GatewayType;
-import org.dinky.executor.ClusterDescriptorAdapterImpl;
-import org.dinky.gateway.result.GatewayResult;
-import org.dinky.gateway.result.YarnResult;
-
-import org.apache.flink.client.deployment.ClusterSpecification;
-import org.apache.flink.client.program.ClusterClient;
-import org.apache.flink.client.program.ClusterClientProvider;
 import org.apache.flink.runtime.jobgraph.JobGraph;
-import org.apache.flink.yarn.YarnClusterDescriptor;
-import org.apache.hadoop.yarn.api.records.ApplicationId;
-
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
-import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.util.URLUtil;
+import org.dinky.data.enums.GatewayType;
+import org.dinky.gateway.result.GatewayResult;
 
 /**
- * YarnApplicationGateway
+ * YARN per-job gateway.
  *
- * @since 2021/10/29
+ * <p>Flink 2.3 removed the per-job deployment mode: {@code
+ * YarnClusterDescriptor#deployJobCluster} no longer exists and {@code ClusterDescriptor} only
+ * offers {@code deploySessionCluster} and {@code deployApplicationCluster}. The gateway type is
+ * kept so that existing cluster configurations can still be loaded, but submitting through it now
+ * fails fast with an actionable message instead of a {@code NoSuchMethodError}.
  */
 public class YarnPerJobGateway extends YarnGateway {
 
@@ -53,38 +41,7 @@ public class YarnPerJobGateway extends YarnGateway {
 
     @Override
     public GatewayResult submitJobGraph(JobGraph jobGraph) {
-        if (Asserts.isNull(yarnClient)) {
-            init();
-        }
-
-        if (Asserts.isNotNull(config.getJarPaths())) {
-            jobGraph.addJars(Arrays.stream(config.getJarPaths())
-                    .map(path -> URLUtil.getURL(FileUtil.file(path)))
-                    .collect(Collectors.toList()));
-        }
-
-        ClusterSpecification.ClusterSpecificationBuilder clusterSpecificationBuilder =
-                createClusterSpecificationBuilder();
-
-        YarnResult result = YarnResult.build(getType());
-        try (YarnClusterDescriptor yarnClusterDescriptor = createInitYarnClusterDescriptor()) {
-            ClusterDescriptorAdapterImpl clusterDescriptorAdapter =
-                    new ClusterDescriptorAdapterImpl(yarnClusterDescriptor);
-            clusterDescriptorAdapter.addShipFiles(Arrays.asList(preparSqlFile()));
-            addConfigParas(
-                    CustomerConfigureOptions.EXEC_SQL_FILE, configuration.get(CustomerConfigureOptions.EXEC_SQL_FILE));
-            ClusterClientProvider<ApplicationId> clusterClientProvider = yarnClusterDescriptor.deployJobCluster(
-                    clusterSpecificationBuilder.createClusterSpecification(), jobGraph, true);
-            ClusterClient<ApplicationId> clusterClient = clusterClientProvider.getClusterClient();
-            ApplicationId applicationId = clusterClient.getClusterId();
-            String webUrl = getWebUrl(clusterClient, result);
-            result.setId(applicationId.toString());
-            result.setWebURL(webUrl);
-
-            result.success();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        return result;
+        throw new UnsupportedOperationException(
+                "YARN per-job mode is not supported by Flink 2.3. Use YARN application or session mode instead.");
     }
 }

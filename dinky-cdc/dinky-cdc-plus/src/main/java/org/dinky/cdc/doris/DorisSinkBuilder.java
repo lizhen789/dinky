@@ -19,29 +19,22 @@
 
 package org.dinky.cdc.doris;
 
+import org.apache.doris.flink.cfg.DorisExecutionOptions;
+import org.apache.doris.flink.cfg.DorisOptions;
+import org.apache.doris.flink.cfg.DorisReadOptions;
+import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.table.data.RowData;
+import org.apache.flink.table.types.DataType;
+import org.apache.flink.table.types.logical.LogicalType;
+import org.apache.flink.table.types.utils.TypeConversions;
 import org.dinky.assertion.Asserts;
 import org.dinky.cdc.AbstractSinkBuilder;
 import org.dinky.cdc.SinkBuilder;
 import org.dinky.data.model.FlinkCDCConfig;
 import org.dinky.data.model.Table;
 
-import org.apache.doris.flink.cfg.DorisExecutionOptions;
-import org.apache.doris.flink.cfg.DorisOptions;
-import org.apache.doris.flink.cfg.DorisReadOptions;
-import org.apache.doris.flink.sink.DorisSink;
-import org.apache.doris.flink.sink.writer.serializer.RowDataSerializer;
-import org.apache.flink.streaming.api.datastream.DataStream;
-import org.apache.flink.table.data.RowData;
-import org.apache.flink.table.types.DataType;
-import org.apache.flink.table.types.logical.LogicalType;
-import org.apache.flink.table.types.utils.TypeConversions;
-
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.UUID;
+import java.util.*;
 
 public class DorisSinkBuilder extends AbstractSinkBuilder implements Serializable {
 
@@ -178,21 +171,11 @@ public class DorisSinkBuilder extends AbstractSinkBuilder implements Serializabl
 
         executionBuilder.setStreamLoadProp(properties);
 
-        // Create DorisSink.
-        DorisSink.Builder<RowData> builder = DorisSink.builder();
-        builder.setDorisReadOptions(readOptionBuilder.build())
-                .setDorisExecutionOptions(executionBuilder.build())
-                .setSerializer(RowDataSerializer.builder()
-                        .setFieldNames(columnNames)
-                        .setType("json")
-                        .enableDelete(true)
-                        .setFieldType(columnTypes)
-                        .build())
-                .setDorisOptions(dorisBuilder.build());
-
-        rowDataDataStream
-                .sinkTo(builder.build())
-                .name(String.format("Doris Sink(table=[%s.%s])", getSinkSchemaName(table), getSinkTableName(table)));
+        // TODO(Flink 2.3): Doris connector 24.0.1 implements sink2 interfaces removed in Flink 2.3
+        // (StatefulSink/TwoPhaseCommittingSink). Restore the DorisSink builder and sinkTo(...) once
+        // a Flink 2.3 compatible Doris connector is used.
+        throw new UnsupportedOperationException(
+                "Doris connector 24.0.1 is incompatible with Flink 2.3; upgrade the connector first.");
     }
 
     @Override

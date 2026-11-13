@@ -19,12 +19,18 @@
 
 package org.dinky.init;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.net.NetUtil;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.flink.runtime.webmonitor.history.HistoryServerUtil;
 import org.dinky.data.model.SystemConfiguration;
 import org.dinky.resource.BaseResourceManager;
 import org.dinky.service.JobInstanceService;
 import org.dinky.service.SysConfigService;
-
-import org.apache.flink.runtime.webmonitor.history.HistoryServerUtil;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -34,15 +40,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
-
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.net.NetUtil;
-import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
@@ -103,7 +100,7 @@ public class FlinkHistoryServer implements ApplicationRunner {
             log.warn(
                     "Flink History Server is enabled but Flink runtime classes are not on the classpath, "
                             + "skip starting the embedded history server. In an IDE, activate the dev profile and reload Maven; "
-                            + "for a release package, put the Flink 1.20 lib jars under extends/flink1.20.");
+                            + "for a release package, put the Flink 2.3 lib jars under extends/flink2.3.");
             return;
         }
 

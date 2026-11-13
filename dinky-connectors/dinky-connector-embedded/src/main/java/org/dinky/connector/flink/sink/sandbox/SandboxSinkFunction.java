@@ -19,23 +19,21 @@
 
 package org.dinky.connector.flink.sink.sandbox;
 
-import org.dinky.assertion.Asserts;
-import org.dinky.sandbox.metadata.ColumnInfo;
-import org.dinky.sandbox.socket.SocketClient;
-
-import org.apache.flink.configuration.Configuration;
-import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.flink.api.common.functions.OpenContext;
+import org.apache.flink.streaming.api.functions.sink.legacy.RichSinkFunction;
 import org.apache.flink.table.data.RowData;
 import org.apache.flink.table.types.DataType;
 import org.apache.flink.table.types.logical.RowType;
 import org.apache.flink.table.types.utils.TypeConversions;
 import org.apache.flink.types.Row;
+import org.dinky.assertion.Asserts;
+import org.dinky.sandbox.metadata.ColumnInfo;
+import org.dinky.sandbox.socket.SocketClient;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class SandboxSinkFunction<IN> extends RichSinkFunction<IN> {
@@ -100,8 +98,8 @@ public class SandboxSinkFunction<IN> extends RichSinkFunction<IN> {
     }
 
     @Override
-    public void open(Configuration parameters) throws Exception {
-        super.open(parameters);
+    public void open(OpenContext openContext) throws Exception {
+        super.open(openContext);
 
         try {
             if (rowType != null) {

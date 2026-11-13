@@ -19,47 +19,30 @@
 
 package org.dinky.gateway.kubernetes.operator;
 
-import static org.dinky.gateway.kubernetes.utils.DinkyKubernetsConstants.DINKY_K8S_INGRESS_DOMAIN_KEY;
-import static org.dinky.gateway.kubernetes.utils.DinkyKubernetsConstants.DINKY_K8S_INGRESS_ENABLED_KEY;
-
+import cn.hutool.core.text.StrFormatter;
+import com.google.common.collect.Lists;
+import io.fabric8.kubernetes.api.model.ObjectMeta;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.flink.configuration.*;
+import org.apache.flink.kubernetes.configuration.KubernetesConfigOptions;
 import org.dinky.assertion.Asserts;
 import org.dinky.data.enums.JobStatus;
 import org.dinky.gateway.enums.UpgradeMode;
 import org.dinky.gateway.kubernetes.KubernetesGateway;
-import org.dinky.gateway.kubernetes.operator.api.AbstractPodSpec;
+import org.dinky.gateway.kubernetes.operator.api.*;
 import org.dinky.gateway.kubernetes.operator.api.AbstractPodSpec.Resource;
-import org.dinky.gateway.kubernetes.operator.api.FlinkDeployment;
-import org.dinky.gateway.kubernetes.operator.api.FlinkDeploymentSpec;
-import org.dinky.gateway.kubernetes.operator.api.IngressSpec;
-import org.dinky.gateway.kubernetes.operator.api.JobSpec;
 import org.dinky.gateway.result.SavePointResult;
 import org.dinky.gateway.result.TestResult;
-
-import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.flink.configuration.CoreOptions;
-import org.apache.flink.configuration.DeploymentOptionsInternal;
-import org.apache.flink.configuration.HighAvailabilityOptions;
-import org.apache.flink.configuration.JobManagerOptions;
-import org.apache.flink.configuration.TaskManagerOptions;
-import org.apache.flink.kubernetes.configuration.KubernetesConfigOptions;
-import org.apache.flink.runtime.jobgraph.SavepointConfigOptions;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
+import java.util.*;
 
-import cn.hutool.core.text.StrFormatter;
-import io.fabric8.kubernetes.api.model.ObjectMeta;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import static org.dinky.gateway.kubernetes.utils.DinkyKubernetsConstants.DINKY_K8S_INGRESS_DOMAIN_KEY;
+import static org.dinky.gateway.kubernetes.utils.DinkyKubernetsConstants.DINKY_K8S_INGRESS_ENABLED_KEY;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -147,7 +130,7 @@ public abstract class KubernetesOperatorGateway extends KubernetesGateway {
         // config.getFlinkConfig().getSavePoint() always is null
         // flinkDeployment spec.flinkConfiguration => subJob flinkConfig > kubernetes Config
         // note: flink operator can't read job some config. ex: savepoint & kubernetes.operator config
-        String savePointPath = configuration.get(SavepointConfigOptions.SAVEPOINT_PATH);
+        String savePointPath = configuration.get(StateRecoveryOptions.SAVEPOINT_PATH);
         logger.info("savePointPath: {}", savePointPath);
 
         // flink operator upgradeMode specifies savepointPath recovery and needs to be matched

@@ -19,11 +19,10 @@
 
 package org.dinky.flink.checkpoint;
 
-import org.dinky.data.model.CheckPointReadTable;
-
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ReflectUtil;
 import org.apache.flink.api.common.typeutils.TypeSerializer;
 import org.apache.flink.api.common.typeutils.TypeSerializerSnapshot;
-import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.core.fs.FSDataInputStream;
 import org.apache.flink.core.memory.DataInputView;
 import org.apache.flink.core.memory.DataInputViewStreamWrapper;
@@ -38,17 +37,15 @@ import org.apache.flink.runtime.state.PartitionableListState;
 import org.apache.flink.runtime.state.RegisteredOperatorStateBackendMetaInfo;
 import org.apache.flink.runtime.state.hashmap.HashMapStateBackend;
 import org.apache.flink.runtime.state.metainfo.StateMetaInfoSnapshot;
-import org.apache.flink.state.api.ExistingSavepoint;
-import org.apache.flink.state.api.Savepoint;
-import org.apache.flink.state.api.runtime.metadata.SavepointMetadata;
+import org.apache.flink.state.api.SavepointReader;
+import org.apache.flink.state.api.runtime.metadata.SavepointMetadataV2;
+import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.dinky.data.model.CheckPointReadTable;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ReflectUtil;
 
 public class CheckpointRead implements CheckpointReadInterface {
     @Override
@@ -56,10 +53,11 @@ public class CheckpointRead implements CheckpointReadInterface {
         ClassLoader restoreClassLoader = Thread.currentThread().getContextClassLoader();
         Map<String, Map<String, CheckPointReadTable>> result = new LinkedHashMap<>();
         try {
-            ExistingSavepoint savepoint =
-                    Savepoint.load(ExecutionEnvironment.getExecutionEnvironment(), path, new HashMapStateBackend());
-            List<OperatorState> operatorStateList =
-                    ((SavepointMetadata) ReflectUtil.getFieldValue(savepoint, "metadata")).getExistingOperators();
+            SavepointReader savepointReader = SavepointReader.read(
+                    StreamExecutionEnvironment.getExecutionEnvironment(), path, new HashMapStateBackend());
+            List<OperatorState> operatorStateList = ((SavepointMetadataV2)
+                    ReflectUtil.getFieldValue(savepointReader, "metadata"))
+                    .getExistingOperators();
             OperatorState existingOperator = operatorStateList.stream()
                     .filter(operatorState -> operatorState
                             .getOperatorID()

@@ -19,6 +19,25 @@
 
 package org.dinky.app.flinksql;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.URLUtil;
+import cn.hutool.http.HttpUtil;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.flink.api.common.Plan;
+import org.apache.flink.api.dag.Pipeline;
+import org.apache.flink.configuration.Configuration;
+import org.apache.flink.configuration.PipelineOptions;
+import org.apache.flink.configuration.ReadableConfig;
+import org.apache.flink.configuration.StateRecoveryOptions;
+import org.apache.flink.core.execution.JobClient;
+import org.apache.flink.python.PythonOptions;
+import org.apache.flink.runtime.jobgraph.SavepointRestoreSettings;
+import org.apache.flink.streaming.api.graph.StreamGraph;
 import org.dinky.app.db.DBUtil;
 import org.dinky.app.model.SysConfig;
 import org.dinky.app.util.FlinkAppUtil;
@@ -50,19 +69,6 @@ import org.dinky.utils.FlinkStreamEnvironmentUtil;
 import org.dinky.utils.SqlUtil;
 import org.dinky.utils.ZipUtils;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.flink.api.common.Plan;
-import org.apache.flink.api.dag.Pipeline;
-import org.apache.flink.configuration.Configuration;
-import org.apache.flink.configuration.PipelineOptions;
-import org.apache.flink.configuration.ReadableConfig;
-import org.apache.flink.core.execution.JobClient;
-import org.apache.flink.python.PythonOptions;
-import org.apache.flink.runtime.jobgraph.SavepointConfigOptions;
-import org.apache.flink.runtime.jobgraph.SavepointRestoreSettings;
-import org.apache.flink.streaming.api.graph.StreamGraph;
-
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -73,20 +79,8 @@ import java.net.URLClassLoader;
 import java.nio.charset.Charset;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
-
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.URLUtil;
-import cn.hutool.http.HttpUtil;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * FlinkSQLFactory
@@ -273,7 +267,7 @@ public class Submitter {
                     if (Asserts.isNotNullString(savePointPath)) {
                         streamGraph.setSavepointRestoreSettings(SavepointRestoreSettings.forPath(
                                 savePointPath,
-                                configuration.get(SavepointConfigOptions.SAVEPOINT_IGNORE_UNCLAIMED_STATE)));
+                                configuration.get(StateRecoveryOptions.SAVEPOINT_IGNORE_UNCLAIMED_STATE)));
                     }
                 } else if (pipeline instanceof Plan) {
                     // batch job

@@ -19,16 +19,6 @@
 
 package org.dinky.data.model;
 
-import org.dinky.parser.SqlSegment;
-
-import org.apache.flink.runtime.jobgraph.SavepointConfigOptions;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.codec.Base64;
@@ -36,6 +26,14 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.flink.configuration.StateRecoveryOptions;
+import org.dinky.parser.SqlSegment;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Setter
 @Getter
@@ -47,7 +45,8 @@ public class JarSubmitParam {
     private String args;
     private String parallelism;
     private String savepointPath;
-    private Boolean allowNonRestoredState = SavepointConfigOptions.SAVEPOINT_IGNORE_UNCLAIMED_STATE.defaultValue();
+    private Boolean allowNonRestoredState =
+            StateRecoveryOptions.SAVEPOINT_IGNORE_UNCLAIMED_STATE.defaultValue();
 
     public static JarSubmitParam build(String statement) {
         JarSubmitParam submitParam = getInfo(statement);

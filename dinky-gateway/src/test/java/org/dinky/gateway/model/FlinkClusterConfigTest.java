@@ -62,7 +62,7 @@ public class FlinkClusterConfigTest {
                 + "        ]\n"
                 + "    },\n"
                 + "    \"appConfig\":{\n"
-                + "        \"userJarPath\":\"hdfs:///flink/dinky/jar/dinky-app-1.20-1.0.0-rc1-jar-with-dependencies.jar\"\n"
+                + "        \"userJarPath\":\"hdfs:///flink/dinky/jar/dinky-app-2.3-1.0.0-rc1-jar-with-dependencies.jar\"\n"
                 + "    }\n"
                 + "}";
         ObjectMapper objectMapper = new ObjectMapper();

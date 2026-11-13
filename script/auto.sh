@@ -3,11 +3,11 @@
 # debug mode
 #set -x
 
-# FLINK_HOME="/opt/module/flink-1.20.0/standalone"
+# FLINK_HOME="/opt/module/flink-2.3.0/standalone"
 echo "Using FLINK_HOME: $FLINK_HOME"
 "$FLINK_HOME/bin/flink" --version
 
-FLINK_VERSION=${2:-1.20}
+FLINK_VERSION=${2:-2.3}
 
 DINKY_HOME=${DINKY_HOME:-$(cd `dirname $0`; pwd)}
 JAVA_VERSION=$(java -version 2>&1 | sed '1!d' | sed -e 's/"//g' | awk '{print $3}' | awk -F'.' '{print $1"."$2}')

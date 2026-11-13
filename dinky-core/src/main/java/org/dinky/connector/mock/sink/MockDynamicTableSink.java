@@ -21,7 +21,7 @@ package org.dinky.connector.mock.sink;
 
 import org.apache.flink.table.connector.ChangelogMode;
 import org.apache.flink.table.connector.sink.DynamicTableSink;
-import org.apache.flink.table.connector.sink.SinkFunctionProvider;
+import org.apache.flink.table.connector.sink.legacy.SinkFunctionProvider;
 import org.apache.flink.table.types.logical.RowType;
 
 public class MockDynamicTableSink implements DynamicTableSink {

@@ -19,6 +19,13 @@
 
 package org.dinky.job;
 
+import cn.hutool.core.collection.CollUtil;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.flink.configuration.*;
+import org.apache.flink.table.api.TableResult;
+import org.apache.flink.yarn.configuration.YarnConfigOptions;
 import org.dinky.api.FlinkAPI;
 import org.dinky.assertion.Asserts;
 import org.dinky.classloader.DinkyClassLoader;
@@ -33,11 +40,7 @@ import org.dinky.data.exception.BusException;
 import org.dinky.data.job.JobStatement;
 import org.dinky.data.job.SqlType;
 import org.dinky.data.model.SystemConfiguration;
-import org.dinky.data.result.ErrorResult;
-import org.dinky.data.result.ExplainResult;
-import org.dinky.data.result.IResult;
-import org.dinky.data.result.ResultBuilder;
-import org.dinky.data.result.SelectResult;
+import org.dinky.data.result.*;
 import org.dinky.executor.Executor;
 import org.dinky.executor.ExecutorConfig;
 import org.dinky.executor.ExecutorFactory;
@@ -59,35 +62,14 @@ import org.dinky.sandbox.metadata.Tuple;
 import org.dinky.trans.Operations;
 import org.dinky.trans.parse.AddFileSqlParseStrategy;
 import org.dinky.trans.parse.AddJarSqlParseStrategy;
-import org.dinky.utils.DinkyClassLoaderUtil;
-import org.dinky.utils.LogUtil;
-import org.dinky.utils.SqlUtil;
-import org.dinky.utils.URLUtils;
-
-import org.apache.flink.configuration.CoreOptions;
-import org.apache.flink.configuration.DeploymentOptions;
-import org.apache.flink.configuration.PipelineOptions;
-import org.apache.flink.runtime.jobgraph.SavepointConfigOptions;
-import org.apache.flink.streaming.api.environment.ExecutionCheckpointingOptions;
-import org.apache.flink.table.api.TableResult;
-import org.apache.flink.yarn.configuration.YarnConfigOptions;
+import org.dinky.utils.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import cn.hutool.core.collection.CollUtil;
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
+import java.util.*;
 
 @Slf4j
 @Data
@@ -386,7 +368,8 @@ public class JobManager {
     }
 
     public String getJobPlanJson(String statement) {
-        return Explainer.build(this).getJobPlanInfo(statement).getJsonPlan();
+        return JsonUtils.toJsonNode(Explainer.build(this).getJobPlanInfo(statement).getPlan())
+                .toString();
     }
 
     public boolean cancelNormal(String jobId) {
@@ -433,13 +416,13 @@ public class JobManager {
         }
         if (Asserts.isNotNull(config.getCheckpoint())) {
             sb.append("set "
-                    + ExecutionCheckpointingOptions.CHECKPOINTING_INTERVAL.key()
+                    + CheckpointingOptions.CHECKPOINTING_INTERVAL.key()
                     + " = "
                     + config.getCheckpoint()
                     + ";\r\n");
         }
         if (Asserts.isNotNullString(config.getSavePointPath())) {
-            sb.append("set " + SavepointConfigOptions.SAVEPOINT_PATH + " = " + config.getSavePointPath() + ";\r\n");
+            sb.append("set " + StateRecoveryOptions.SAVEPOINT_PATH.key() + " = " + config.getSavePointPath() + ";\r\n");
         }
         if (Asserts.isNotNull(config.getGatewayConfig())
                 && Asserts.isNotNull(config.getGatewayConfig().getFlinkConfig().getConfiguration())) {

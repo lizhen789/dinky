@@ -17,15 +17,15 @@ title: 连接Fink SQL Cli
 
 1. 下载flink
 ```bash
-wget https://archive.apache.org/dist/flink/flink-1.20.2/flink-1.20.2-bin-scala_2.12.tgz
+wget https://archive.apache.org/dist/flink/flink-2.3.0/flink-2.3.0-bin-scala_2.12.tgz
 ```
 2. 解压flink
 ```bash
-tar -zxvf flink-1.20.2-bin-scala_2.12.tgz
+tar -zxvf flink-2.3.0-bin-scala_2.12.tgz
 ```
 3. 启动flink
 ```bash
-cd flink-1.20.2
+cd flink-2.3.0
 ./bin/start-cluster.sh 
 
 Starting cluster.
@@ -36,8 +36,8 @@ Starting taskexecutor daemon on host DESKTOP-S65S3F5.
 ## 准备依赖
 连接flink sql cli需要两个jar包
 ```bash
--rw-r--r-- 1 root root 931K Aug  7 20:43 flink-sql-client-1.20.2.jar
--rw-r--r-- 1 root root 206K Aug  7 20:43 flink-sql-gateway-1.20.2.jar
+-rw-r--r-- 1 root root 931K Aug  7 20:43 flink-sql-client-2.3.0.jar
+-rw-r--r-- 1 root root 206K Aug  7 20:43 flink-sql-gateway-2.3.0.jar
 ```
 他们在flink安装目录 opt文件夹下面，属于可选组件，所以dinky docker内默认没有集成，我们需要放进去
 
@@ -46,19 +46,19 @@ Starting taskexecutor daemon on host DESKTOP-S65S3F5.
 cd ..
 mkdir /data
 mkdir /data/flink
-cp flink-1.20.2/opt/flink-sql-client-1.20.2.jar /data/flink
-cp flink-1.20.2/opt/flink-sql-gateway-1.20.2.jar /data/flink
+cp flink-2.3.0/opt/flink-sql-client-2.3.0.jar /data/flink
+cp flink-2.3.0/opt/flink-sql-gateway-2.3.0.jar /data/flink
 ```
 ## 部署Dinky
 dinky 1.1.0发布了docker包，我们可以通过docker 快速部署
 ```bash
 # 下载镜像
-docker pull dinkydocker/dinky-standalone-server:1.1.0-flink1.20
+docker pull dinkydocker/dinky-standalone-server:1.1.0-flink2.3
 # 启动服务
 docker run --restart=always -p 8888:8888 \
   --name dinky \
   -v /data/flink:/opt/dinky/customJar/ \ 
-  dinkydocker/dinky-standalone-server:1.1.0-flink1.20
+  dinkydocker/dinky-standalone-server:1.1.0-flink2.3
 ```
 参数解释
 > `-p 8888:8888 `

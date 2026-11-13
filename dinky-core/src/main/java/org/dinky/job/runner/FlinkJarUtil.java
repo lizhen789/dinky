@@ -19,6 +19,12 @@
 
 package org.dinky.job.runner;
 
+import cn.hutool.core.lang.Assert;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.flink.api.dag.Pipeline;
+import org.apache.flink.configuration.Configuration;
+import org.apache.flink.runtime.jobgraph.JobGraph;
+import org.apache.flink.runtime.jobgraph.jsonplan.JsonPlanGenerator;
 import org.dinky.classloader.DinkyClassLoader;
 import org.dinky.data.exception.DinkyException;
 import org.dinky.data.job.SqlType;
@@ -37,19 +43,10 @@ import org.dinky.utils.FlinkStreamEnvironmentUtil;
 import org.dinky.utils.JsonUtils;
 import org.dinky.utils.SqlUtil;
 
-import org.apache.flink.api.dag.Pipeline;
-import org.apache.flink.configuration.Configuration;
-import org.apache.flink.runtime.jobgraph.JobGraph;
-import org.apache.flink.runtime.jobgraph.jsonplan.JsonPlanGenerator;
-
 import java.io.File;
 import java.net.URL;
 import java.util.List;
 import java.util.Set;
-
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import cn.hutool.core.lang.Assert;
 
 public class FlinkJarUtil {
     public static ObjectNode getJobPlan(String statement, JobManager jobManager) {
@@ -58,7 +55,7 @@ public class FlinkJarUtil {
             Configuration configuration =
                     Configuration.fromMap(jobManager.getExecutorConfig().getConfig());
             JobGraph jobGraph = FlinkStreamEnvironmentUtil.getJobGraph(pipeline, configuration);
-            return JsonUtils.parseObject(JsonPlanGenerator.generatePlan(jobGraph));
+            return (ObjectNode) JsonUtils.toJsonNode(JsonPlanGenerator.generatePlan(jobGraph));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

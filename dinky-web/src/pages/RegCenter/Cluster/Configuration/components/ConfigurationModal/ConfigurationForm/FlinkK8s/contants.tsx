@@ -22,4 +22,4 @@ export const ExposedTypeOptions = [
   { label: 'ClusterIP', value: 'ClusterIP' }
 ];
 
-export const versionOptions = [{ label: '1.20', value: 'v1_20' }];
+export const versionOptions = [{ label: '2.3', value: 'v2_3' }];

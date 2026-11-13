@@ -19,13 +19,7 @@
 
 package org.dinky.resource.impl;
 
-import org.apache.flink.core.fs.BlockLocation;
-import org.apache.flink.core.fs.FSDataInputStream;
-import org.apache.flink.core.fs.FSDataOutputStream;
-import org.apache.flink.core.fs.FileStatus;
-import org.apache.flink.core.fs.FileSystem;
-import org.apache.flink.core.fs.FileSystemKind;
-import org.apache.flink.core.fs.Path;
+import org.apache.flink.core.fs.*;
 
 import java.io.IOException;
 import java.net.URI;
@@ -100,8 +94,4 @@ public class HttpFileSystem extends FileSystem {
         return false;
     }
 
-    @Override
-    public FileSystemKind getKind() {
-        return null;
-    }
 }

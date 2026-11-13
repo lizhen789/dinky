@@ -19,6 +19,7 @@
 
 package org.apache.flink.runtime.webmonitor.history;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.core.fs.FileSystem;
 import org.apache.flink.core.plugin.PluginUtils;
@@ -28,8 +29,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public final class HistoryServerUtil {
@@ -41,11 +40,16 @@ public final class HistoryServerUtil {
             org.apache.flink.configuration.Configuration configuration = Configuration.fromMap(config);
             FileSystem.initialize(configuration, PluginUtils.createPluginManagerFromRootFolder(configuration));
 
-            hs = new HistoryServer(configuration, (event) -> {
-                if (event.getType() == HistoryServerArchiveFetcher.ArchiveEventType.CREATED) {
-                    Optional.ofNullable(jobIdEventListener).ifPresent(listener -> listener.accept(event.getJobID()));
-                }
-            });
+            hs = new HistoryServer(
+                    configuration,
+                    (event) -> {
+                        if (event.getType() == HistoryServerArchiveFetcher.ArchiveEventType.CREATED) {
+                            Optional.ofNullable(jobIdEventListener)
+                                    .ifPresent(listener -> listener.accept(event.getId()));
+                        }
+                    },
+                    (event) -> {
+                    });
             log.info("Flink History service started successfully.");
         } catch (IOException | FlinkException e) {
             log.error(

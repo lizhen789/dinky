@@ -19,23 +19,15 @@
 
 package org.dinky.url;
 
-import org.dinky.resource.BaseResourceManager;
-
+import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.io.InputStreamFSInputWrapper;
-import org.apache.flink.core.fs.BlockLocation;
-import org.apache.flink.core.fs.FSDataInputStream;
-import org.apache.flink.core.fs.FSDataOutputStream;
-import org.apache.flink.core.fs.FileStatus;
-import org.apache.flink.core.fs.FileSystem;
-import org.apache.flink.core.fs.FileSystemKind;
-import org.apache.flink.core.fs.Path;
+import org.apache.flink.core.fs.*;
 import org.apache.flink.core.fs.local.LocalFileStatus;
+import org.dinky.resource.BaseResourceManager;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ResourceFileSystem extends FileSystem {
@@ -138,11 +130,6 @@ public class ResourceFileSystem extends FileSystem {
     @Override
     public boolean isDistributedFS() {
         return true;
-    }
-
-    @Override
-    public FileSystemKind getKind() {
-        return FileSystemKind.OBJECT_STORE;
     }
 
     public static ResourceFileSystem getSharedInstance() {
